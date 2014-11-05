@@ -1,6 +1,8 @@
 #include "controller.h"
 #include "commands.h"
-uint nextTid = 0;
+
+uint nextTid = 512;
+
 int main( int argc, char* argv[]){
 	listenForHosts(); // listen to establish connections to hosts
 	
@@ -59,7 +61,6 @@ void controllerCommandTerminal() {
 
 void executeUserCommand( char* cmdArgs[32]) {
 	int indexOfCommand = getCommandIndex( cmdArgs[1]);
-	
 	switch ( indexOfCommand) {
 		case 0:										// alias command
 			printf( "alias command\n");

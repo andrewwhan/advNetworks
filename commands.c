@@ -9,18 +9,34 @@ void sendMessage(char cid, char** cmdArgs){
 	extern uint nextTid;
 
 	int i = 0;
-	int dataLength = 0;
-	while(strlen(cmdArgs[i]) != 0){
-		printf("%s", cmdArgs[i]);
+	short dataLength = 0;
+	int msgLoc = 0;
+	char space = ' ';
+
+	while(cmdArgs[i]){ //As long as there are still arguments
 		dataLength += strlen(cmdArgs[i]) + 1;
 		i++;
-		printf("%i, %i", i, strlen(cmdArgs[i]));
 	}
-	void* messagePtr = malloc(sizeof(char) * HEADER);
-	memcpy(&cid, messagePtr, 1);
+	char* messagePtr = malloc(sizeof(char) * (HEADER + dataLength));
+	memcpy(messagePtr + msgLoc, &cid, 1);
+	msgLoc++;
 	nextTid++;
-	memcpy(&nextTid, messagePtr+1, sizeof(uint));
-	short length;
+	memcpy(messagePtr + msgLoc, &nextTid, sizeof(uint));
+	msgLoc += 4;
+	memcpy(messagePtr + msgLoc, &dataLength, sizeof(short));
+	msgLoc += 2;
+	i=0;
+	while(cmdArgs[i]){
+		memcpy(messagePtr + msgLoc, cmdArgs[i], strlen(cmdArgs[i]));
+		memcpy(messagePtr + msgLoc + strlen(cmdArgs[i]), &space, sizeof(char));
+		msgLoc += strlen(cmdArgs[i]) + 1;
+		i++;
+	}
+
+	for(i=0; i<msgLoc; i++){
+		printf("%02X \n", messagePtr[i]);
+	}
+	fwrite(messagePtr, msgLoc, 1, stdout);
 }
 
 void aliasCommand( char** cmdArgs) {
@@ -28,6 +44,7 @@ void aliasCommand( char** cmdArgs) {
 }
 void responseCommand( char** cmdArgs) {
 	printf("hi r\n");
+	sendMessage(0x00, cmdArgs);
 }
 void natCommand( char** cmdArgs) {
 	printf("hi n\n");

@@ -56,20 +56,21 @@ void controllerCommandTerminal() {
 	exit(0);
 }
 
-void executeUserCommand(char* cmdArgs[32]) {
-	int indexOfCommand = getCommandIndex( cmdArgs[0]);
+void executeUserCommand( char* cmdArgs[32]) {
+	int indexOfCommand = getCommandIndex( cmdArgs[1]);
+	
 	switch ( indexOfCommand) {
-		case 0:										// IPv6 command
-			printf( "IPv6 command\n");
-			// IPv6 command name
+		case 0:										// alias command
+			printf( "alias command\n");
+			aliasCommand( cmdArgs);
 			break;
-		case 1:										// request response from host command
-			printf("reqesting response\n");
-			requestResponseFromHost(cmdArgs);
+		case 1:										// request command
+			printf( "request response command\n");
+			responseCommand( cmdArgs);
 			break;
-		case 2:
-			printf( "NAT command\n");
-			// NAT command name
+		case 2:										// nat command
+			printf( "nat command\n");
+			natCommand( cmdArgs);
 			break;
 		case -1:									// error: command name not recognized
 			printf( "not valid command\n");
@@ -79,12 +80,12 @@ void executeUserCommand(char* cmdArgs[32]) {
 }
 
 int getCommandIndex( char* cmdName) {
-	const char* cmdNames[] = { "alias", "request", "nat"};
+	const char* cmdNames[] = { "alias", "request", "nat"};			// check command names
 	int i;
-	for( i = 0; i < sizeof(cmdNames); i++) {
+	for( i = 0; i < 3; i++) {
 		if( !strcmp( cmdName, cmdNames[i])) {
 			return i;
 		}
 	}
-	return -1;
+	return -1; 			// failed to identify command
 }

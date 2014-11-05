@@ -1,9 +1,13 @@
 #include "controller.h"
-
+#include "commands.h"
 
 int main(int argc, char* argv[]){
-	//listenForHosts(); // listen to establish connections to hosts
+	listenForHosts(); // listen to establish connections to hosts
 	controllerCommandTerminal(); // start command line for user input
+}
+
+void listenForHosts(){
+
 }
 
 void controllerCommandTerminal() {
@@ -61,7 +65,7 @@ void executeUserCommand(char* cmdName, char* cmdArgs[32]) {
 			break;
 		case 1:										// request response from host command
 			printf("reqesting response\n");
-			//requestResponseFromHost(cmdArgs);
+			requestResponseFromHost(cmdArgs);
 			break;
 		case -1:									// error: command name not recognized
 			printf("not valid command\n");

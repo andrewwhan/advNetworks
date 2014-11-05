@@ -1,8 +1,9 @@
 #include "controller.h"
 #include "commands.h"
-
+uint nextTid = 0;
 int main( int argc, char* argv[]){
 	listenForHosts(); // listen to establish connections to hosts
+	
 	controllerCommandTerminal(); // start command line for user input
 }
 
@@ -38,7 +39,7 @@ void controllerCommandTerminal() {
 					exit(0);
 				}
 				else{
-					executeUserCommand( cmdtok);		// execute the user command
+					executeUserCommand(cmdtok);		// execute the user command
 				}
 			}
 			else{

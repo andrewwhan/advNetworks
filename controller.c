@@ -1,7 +1,7 @@
 #include "controller.h"
 
 
-int main(int argc, char* argv[]){
+int main( int argc, char* argv[]){
 	//listenForHosts(); // listen to establish connections to hosts
 	controllerCommandTerminal(); // start command line for user input
 }
@@ -14,27 +14,27 @@ void controllerCommandTerminal() {
 	const char* exitstr = "exit";
 
 	while(1){ 							// start command loop
-		printf("(^_^)");
-		fgets(cmdline, 129, stdin);
-		if(strlen(cmdline) < 128){ 		// ensure command is within certain length
-			if(feof(stdin)){									// for piping in file
-				printf("exit\n");
-				exit(0);
+		printf( "(^_^) >");
+		fgets( cmdline, 129, stdin);
+		if( strlen( cmdline) < 128){ 		// ensure command is within certain length
+			if( feof( stdin)){									// for piping in file
+				printf( "exit\n");
+				exit( 0);
 			}
 			int tokcnt = 1;
-			cmdtok[0] = strtok(cmdline, delimiter);				// tokenize command
-			while(cmdtok[tokcnt-1]){
-				cmdtok[tokcnt] = strtok(NULL, delimiter);
+			cmdtok[0] = strtok( cmdline, delimiter);				// tokenize command
+			while( cmdtok[tokcnt-1]){
+				cmdtok[tokcnt] = strtok( NULL, delimiter);
 				tokcnt++;
 			}
-			if(tokcnt <= 32){									// ensure valid number of arguments
+			if( tokcnt <= 32){									// ensure valid number of arguments
 				if(!cmdtok[0]){
 				}
-				else if(!strcmp(cmdtok[0], exitstr)){
+				else if( !strcmp( cmdtok[0], exitstr)){
 					exit(0);
 				}
 				else{
-					executeUserCommand(cmdtok[0], cmdtok);		// execute the user command
+					executeUserCommand( cmdtok);		// execute the user command
 				}
 			}
 			else{
@@ -52,29 +52,33 @@ void controllerCommandTerminal() {
 	exit(0);
 }
 
-void executeUserCommand(char* cmdName, char* cmdArgs[32]) {
-	int indexOfCommand = getCommandIndex(cmdName);
-	switch (indexOfCommand) {
+void executeUserCommand(char* cmdArgs[32]) {
+	int indexOfCommand = getCommandIndex( cmdArgs[0]);
+	switch ( indexOfCommand) {
 		case 0:										// IPv6 command
-			printf("IPv6 command\n");
+			printf( "IPv6 command\n");
 			// IPv6 command name
 			break;
 		case 1:										// request response from host command
-			printf("reqesting response\n");
+			printf( "reqesting response\n");
 			//requestResponseFromHost(cmdArgs);
 			break;
+		case 2:
+			printf( "NAT command\n");
+			// NAT command name
+			break;
 		case -1:									// error: command name not recognized
-			printf("not valid command\n");
+			printf( "not valid command\n");
 			break;
 	}
 	return;
 }
 
-int getCommandIndex(char* cmdName) {
-	const char* cmdNames[] = { "IPv6", "request"};
+int getCommandIndex( char* cmdName) {
+	const char* cmdNames[] = { "alias", "request", "nat"};
 	int i;
-	for(i = 0; i < 2; i++) {
-		if(!strcmp(cmdName, cmdNames[i])) {
+	for( i = 0; i < sizeof(cmdNames); i++) {
+		if( !strcmp( cmdName, cmdNames[i])) {
 			return i;
 		}
 	}

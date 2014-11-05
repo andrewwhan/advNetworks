@@ -5,5 +5,5 @@
 #include <string.h>
 
 void controllerCommandTerminal();
-void executeUserCommand(char* cmdName, char* cmdArgs[32]);
+void executeUserCommand(char* cmdArgs[32]);
 int getCommandIndex(char* cmdName);

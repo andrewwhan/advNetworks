@@ -1,0 +1,1 @@
+void requestResponseFromHost(char** cmdArgs);

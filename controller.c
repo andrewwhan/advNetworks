@@ -1,9 +1,14 @@
 #include "controller.h"
+#include "commands.h"
 
-
+<<<<<<< HEAD
 int main( int argc, char* argv[]){
-	//listenForHosts(); // listen to establish connections to hosts
+	listenForHosts(); // listen to establish connections to hosts
 	controllerCommandTerminal(); // start command line for user input
+}
+
+void listenForHosts(){
+
 }
 
 void controllerCommandTerminal() {
@@ -60,8 +65,8 @@ void executeUserCommand(char* cmdArgs[32]) {
 			// IPv6 command name
 			break;
 		case 1:										// request response from host command
-			printf( "reqesting response\n");
-			//requestResponseFromHost(cmdArgs);
+			printf("reqesting response\n");
+			requestResponseFromHost(cmdArgs);
 			break;
 		case 2:
 			printf( "NAT command\n");

@@ -21,7 +21,7 @@ void controllerCommandTerminal() {
 	const char* exitstr = "exit";
 
 	while(1){ 							// start command loop
-		printf( "(^_^) >");
+		printf( "(^_^)> ");
 		fgets( cmdline, 129, stdin);
 		if( strlen( cmdline) < 128){ 		// ensure command is within certain length
 			if( feof( stdin)){									// for piping in file
@@ -60,23 +60,27 @@ void controllerCommandTerminal() {
 }
 
 void executeUserCommand( char* cmdArgs[32]) {
-	int indexOfCommand = getCommandIndex( cmdArgs[1]);
-	switch ( indexOfCommand) {
-		case 0:										// alias command
-			printf( "alias command\n");
-			aliasCommand( cmdArgs);
-			break;
-		case 1:										// request command
-			printf( "request response command\n");
-			responseCommand( cmdArgs);
-			break;
-		case 2:										// nat command
-			printf( "nat command\n");
-			natCommand( cmdArgs);
-			break;
-		case -1:									// error: command name not recognized
-			printf( "not valid command\n");
-			break;
+	if( !cmdArgs[1]){
+		printf( "no second command\n");					// error: no second command
+	} else {
+		int indexOfCommand = getCommandIndex( cmdArgs[1]);
+		switch ( indexOfCommand) {
+			case 0:										// alias command
+				printf( "alias command\n");
+				aliasCommand( cmdArgs);
+				break;
+			case 1:										// request command
+				printf( "request response command\n");
+				responseCommand( cmdArgs);
+				break;
+			case 2:										// nat command
+				printf( "nat command\n");
+				natCommand( cmdArgs);
+				break;
+			case -1:									// error: command name not recognized
+				printf( "not valid command\n");
+				break;
+		}
 	}
 	return;
 }

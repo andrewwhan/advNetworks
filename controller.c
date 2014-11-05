@@ -57,24 +57,26 @@ void controllerCommandTerminal() {
 }
 
 void executeUserCommand( char* cmdArgs[32]) {
-	int indexOfCommand = getCommandIndex( cmdArgs[1]);
-	
-	switch ( indexOfCommand) {
-		case 0:										// alias command
-			printf( "alias command\n");
-			aliasCommand( cmdArgs);
-			break;
-		case 1:										// request command
-			printf( "request response command\n");
-			responseCommand( cmdArgs);
-			break;
-		case 2:										// nat command
-			printf( "nat command\n");
-			natCommand( cmdArgs);
-			break;
-		case -1:									// error: command name not recognized
-			printf( "not valid command\n");
-			break;
+	if( !cmdArgs[1]){
+	} else {
+		int indexOfCommand = getCommandIndex( cmdArgs[1]);
+		switch ( indexOfCommand) {
+			case 0:										// alias command
+				printf( "alias command\n");
+				aliasCommand( cmdArgs);
+				break;
+			case 1:										// request command
+				printf( "request response command\n");
+				responseCommand( cmdArgs);
+				break;
+			case 2:										// nat command
+				printf( "nat command\n");
+				natCommand( cmdArgs);
+				break;
+			case -1:									// error: command name not recognized
+				printf( "not valid command\n");
+				break;
+		}
 	}
 	return;
 }

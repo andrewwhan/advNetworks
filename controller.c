@@ -18,7 +18,7 @@ void controllerCommandTerminal() {
 	const char* exitstr = "exit";
 
 	while(1){ 							// start command loop
-		printf( "(^_^) >");
+		printf( "(^_^)> ");
 		fgets( cmdline, 129, stdin);
 		if( strlen( cmdline) < 128){ 		// ensure command is within certain length
 			if( feof( stdin)){									// for piping in file
@@ -58,6 +58,7 @@ void controllerCommandTerminal() {
 
 void executeUserCommand( char* cmdArgs[32]) {
 	if( !cmdArgs[1]){
+		printf( "no second command\n");					// error: no second command
 	} else {
 		int indexOfCommand = getCommandIndex( cmdArgs[1]);
 		switch ( indexOfCommand) {

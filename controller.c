@@ -1,7 +1,6 @@
 #include "controller.h"
 #include "commands.h"
 
-<<<<<<< HEAD
 int main( int argc, char* argv[]){
 	listenForHosts(); // listen to establish connections to hosts
 	controllerCommandTerminal(); // start command line for user input

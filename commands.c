@@ -10,11 +10,6 @@ void sendMessage(char cid){
 	memcpy(&cid, messagePtr, 1);
 }
 
-void requestResponseFromHost(char** cmdArgs){
-	printf("hi");
-}
-
-
 void aliasCommand( char** cmdArgs) {
 	printf("hi a\n");
 }

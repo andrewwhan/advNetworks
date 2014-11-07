@@ -34,12 +34,12 @@ void sendMessage(char cid, char** cmdArgs){
 		i++;
 	}
 
-	for(i=0; i<msgLoc; i++){
-		printf("%02X \n", messagePtr[i]);
-	}
-	fwrite(messagePtr, msgLoc, 1, stdout);
+	// for(i=0; i<msgLoc; i++){
+	// 	printf("%02X \n", messagePtr[i]);
+	// }
+	//fwrite(messagePtr, msgLoc, 1, stdout);
 	
-	receiveCommand();
+	receiveCommand(messagePtr);
 }
 
 void aliasCommand( char** cmdArgs) {

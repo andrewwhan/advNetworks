@@ -33,12 +33,13 @@ struct hostInfo* loadDatabase(){
 			prevHost->next = host;
 		}
 		
-		fscanf(dbFile, "%s %s", host->hostName, host->secret);
+		end = fscanf(dbFile, "%s %s", host->hostName, host->secret);
+		printf("name: %s,\n secret: %s,\n end: %d\n", host->hostName, host->secret, end);
 	}
 }
 
 void listenForHosts(){
-
+	return;
 }
 
 void controllerCommandTerminal() {

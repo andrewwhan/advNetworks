@@ -1,5 +1,6 @@
 #include "controller.h"
 #include "commands.h"
+#include "hostCommands.h"
 
 uint nextTid = 512;
 

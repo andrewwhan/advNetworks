@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <unistd.h>
 #include <string.h>
+#include "hostCommands.h"
 
 #define HEADER 7
 
@@ -37,6 +38,8 @@ void sendMessage(char cid, char** cmdArgs){
 		printf("%02X \n", messagePtr[i]);
 	}
 	fwrite(messagePtr, msgLoc, 1, stdout);
+	
+	receiveCommand();
 }
 
 void aliasCommand( char** cmdArgs) {

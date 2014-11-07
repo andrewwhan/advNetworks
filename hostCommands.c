@@ -9,12 +9,13 @@ void receiveCommand(char* messagePtr) {
 	char cid = *messagePtr;
 	uint tid = *(messagePtr + 1);
 	short dataLength = *(messagePtr + 5);
+	char* dataStart = messagePtr + 7;
 
 	printf("%02X, %u \n", cid, tid);
 
 	switch(cid){
 		case 0x00:
-			// Add alias command
+			addIPv6Alias(cid, tid, dataLength, dataStart);
 			break;
 		case 0x10:
 			// Remove alias command
@@ -39,6 +40,12 @@ void receiveCommand(char* messagePtr) {
 	}
 	return;
 }
+
+/* Command Specific Function Template
+void function(char cid, uint tid, short dataLength, char* dataStart){
+	
+}
+*/
 
 void executeArgs(char* args[]) {
 

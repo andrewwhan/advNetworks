@@ -5,10 +5,38 @@
 #include <string.h>
 #include "hostCommands.h"
 
-void receiveCommand() {
-	printf("\n\n");
-	char* args[] =  {"ifconfig", '\0'};
-	executeArgs(args);
+void receiveCommand(char* messagePtr) {
+	char cid = *messagePtr;
+	uint tid = *(messagePtr + 1);
+	short dataLength = *(messagePtr + 5);
+
+	printf("%02X, %u \n", cid, tid);
+
+	switch(cid){
+		case 0x00:
+			// Add alias command
+			break;
+		case 0x10:
+			// Remove alias command
+			break;
+		case 0x20:
+			// Show aliases command
+			break;
+		case 0x32:
+			// Request response from host command
+			break;
+		case 0x03:
+			// Add nat rule command
+			break;
+		case 0x13:
+			// Remove nat rule command
+			break;
+		case 0x23:
+			// Show nat rules command
+			break;
+		case default:
+			break;
+	}
 	return;
 }
 

@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
-#include  <sys/types.h>
+#include <sys/types.h>
 #include <string.h>
 #include "hostCommands.h"
 
@@ -35,7 +35,7 @@ void receiveCommand(char* messagePtr) {
 		case 0x23:
 			// Show nat rules command
 			break;
-		case default:
+		default:
 			break;
 	}
 	return;

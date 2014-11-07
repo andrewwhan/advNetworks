@@ -4,10 +4,37 @@
 
 uint nextTid = 512;
 
+struct hostInfo{
+	char hostName[32];
+	char secret[16];
+	struct hostInfo* next;
+}
+
 int main( int argc, char* argv[]){
+	struct hostInfo* hosts = loadDatabase(); //Read database file for host information
 	listenForHosts(); // listen to establish connections to hosts
 	
 	controllerCommandTerminal(); // start command line for user input
+}
+
+struct hostInfo* loadDatabase(){
+	FILE* dbFile;
+	dbFile = fopen("database.txt", 'r');
+	int end = 0;
+	struct hostInfo* firstHost = null;
+	struct hostInfo* prevHost = null;
+	while(end != EOF){
+		struct hostInfo* host = malloc(sizeof(struct hostInfo));
+		if(firstHost == null){
+			firstHost = host;
+			prevHost = host;
+		}
+		else{
+			prevHost->next = host;
+		}
+		
+		fscanf(dbFile, "%s %s", host->hostName, host->secret);
+	}
 }
 
 void listenForHosts(){

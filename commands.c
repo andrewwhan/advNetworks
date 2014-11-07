@@ -43,7 +43,7 @@ void sendMessage(char cid, char** cmdArgs){
 }
 
 void aliasCommand( char** cmdArgs) {
-	int commandIndex = getCommandIndexASR( cmdArgs[0]);
+	int commandIndex = getCommandIndexASR( cmdArgs[1]);
 	switch (commandIndex) {
 		case 0:			// add 0x0
 			sendMessage(0x00, cmdArgs);
@@ -61,6 +61,7 @@ void aliasCommand( char** cmdArgs) {
 	return;
 	
 }
+
 void responseCommand( char** cmdArgs) {
 	int commandIndex = getCommandIndexASR( cmdArgs[0]);
 	switch (commandIndex) {
@@ -79,8 +80,9 @@ void responseCommand( char** cmdArgs) {
 	}
 	return;
 }
+
 void natCommand( char** cmdArgs) {
-	int commandIndex = getCommandIndexASR( cmdArgs[0]);
+	int commandIndex = getCommandIndexASR( cmdArgs[1]);
 	switch (commandIndex) {
 		case 0:			// add
 			sendMessage(0x03, cmdArgs);

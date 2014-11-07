@@ -61,10 +61,10 @@ void controllerCommandTerminal() {
 }
 
 void executeUserCommand( char* cmdArgs[32]) {
-	if( !cmdArgs[1]){
+	if( !cmdArgs[0]){
 		printf( "no second command\n");					// error: no second command
 	} else {
-		int indexOfCommand = getCommandIndex( cmdArgs[1]);
+		int indexOfCommand = getCommandIndex( cmdArgs[0]);
 		switch ( indexOfCommand) {
 			case 0:										// alias command
 				printf( "alias command\n");

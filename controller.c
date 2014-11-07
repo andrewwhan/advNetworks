@@ -8,7 +8,7 @@ struct hostInfo{
 	char hostName[32];
 	char secret[16];
 	struct hostInfo* next;
-}
+};
 
 int main( int argc, char* argv[]){
 	struct hostInfo* hosts = loadDatabase(); //Read database file for host information
@@ -19,13 +19,13 @@ int main( int argc, char* argv[]){
 
 struct hostInfo* loadDatabase(){
 	FILE* dbFile;
-	dbFile = fopen("database.txt", 'r');
+	dbFile = fopen("database.txt", "r");
 	int end = 0;
-	struct hostInfo* firstHost = null;
-	struct hostInfo* prevHost = null;
+	struct hostInfo* firstHost = NULL;
+	struct hostInfo* prevHost = NULL;
 	while(end != EOF){
 		struct hostInfo* host = malloc(sizeof(struct hostInfo));
-		if(firstHost == null){
+		if(firstHost == NULL){
 			firstHost = host;
 			prevHost = host;
 		}

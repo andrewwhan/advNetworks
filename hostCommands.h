@@ -1,2 +1,2 @@
 void receiveCommand();
-void executeArgs(char* args[]);
+int executeArgs(char* args[]);

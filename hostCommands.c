@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
-#include  <sys/types.h>
+#include <sys/types.h>
 #include <string.h>
 #include "hostCommands.h"
 
@@ -12,7 +12,7 @@ void receiveCommand() {
 	return;
 }
 
-void executeArgs(char* args[]) {
+int executeArgs(char* args[]) {
 
 	pid_t  pid;
 	int    status;
@@ -29,6 +29,6 @@ void executeArgs(char* args[]) {
 	} else {						/* for the parent:		*/
 		while (wait(&status) != pid);			/* wait for completion		*/
 	}
-
-	return;
+	printf("%d\n", status);
+	return status;
 }

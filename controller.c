@@ -21,7 +21,7 @@ void controllerCommandTerminal() {
 	const char* cdstr = "cd";
 	const char* exitstr = "exit";
 
-	while(1){ 							// start command loop
+	while(1){ 								// start command loop
 		printf( "(^_^)> ");
 		fgets( cmdline, 129, stdin);
 		if( strlen( cmdline) < 128){ 		// ensure command is within certain length
@@ -30,7 +30,7 @@ void controllerCommandTerminal() {
 				exit( 0);
 			}
 			int tokcnt = 1;
-			cmdtok[0] = strtok( cmdline, delimiter);				// tokenize command
+			cmdtok[0] = strtok( cmdline, delimiter);			// tokenize command
 			while( cmdtok[tokcnt-1]){
 				cmdtok[tokcnt] = strtok( NULL, delimiter);
 				tokcnt++;
@@ -42,7 +42,7 @@ void controllerCommandTerminal() {
 					exit(0);
 				}
 				else{
-					executeUserCommand(cmdtok);		// execute the user command
+					executeUserCommand(cmdtok);					// execute the user command
 				}
 			}
 			else{

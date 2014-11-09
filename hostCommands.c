@@ -27,6 +27,7 @@ void receiveCommand(char* messagePtr) {
 			// Remove alias command
 			break;
 		case 0x20:
+			showIPv6Alias(cid, tid, dataLength, dataStart);
 			// Show aliases command
 			break;
 		case 0x32:
@@ -55,7 +56,8 @@ void function(char cid, uint tid, short dataLength, char* dataStart){
 
 int executeArgs(char* args[]) {
 
-
+	FILE* seFile;
+	seFile = fopen("hostSTDERR.txt", "w");
 	pid_t  pid;
 	int    status;
 
@@ -63,6 +65,8 @@ int executeArgs(char* args[]) {
 		printf("*** ERROR: forking child process failed\n");
 		exit(1);
 	} else if (pid == 0) {					/* for the child process:	*/
+		dup2(fileno(seFile), STDERR_FILENO);
+		fclose(seFile);
 		if (execvp(args[0], args) < 0) {		/* execute the command		*/
 			printf("*** ERROR: exec failed\n");
 			exit(1);
@@ -71,12 +75,47 @@ int executeArgs(char* args[]) {
 	} else {						/* for the parent:		*/
 		while (wait(&status) != pid);			/* wait for completion		*/
 	}
-	printf("%d\n", status);
-	return !status;
+	return !status; // convert to true/false value
+}
+
+int executeShow(char* args[]) {
+	FILE* soFile;
+	soFile = fopen("hostSTDOUT.txt", "w");
+	int status;
+        pid_t   childpid;
+        
+        if((childpid = fork()) == -1)
+        {
+                perror("fork");
+                exit(1);
+        }
+        if(childpid == 0)
+        {
+		dup2(fileno(soFile), STDOUT_FILENO);
+		fclose(soFile);
+		if (execvp(args[0], args) < 0) {
+			printf("*** ERROR: exec failed\n");
+			exit(1);
+		}
+                exit(0);
+        }
+        else
+        {
+		while (wait(&status) != childpid);			/* wait for completion		*/
+		char textStuff[128];
+		char end = '0';
+		fclose(soFile);
+        }
+	return !status; // convert to true/false value
 }
 
 void sendSuccess(char cid, uint tid) {
 	printf("success\n");
+	return;
+}
+
+void sendShow(char cid, uint tid) {
+	printf("show\n");
 	return;
 }
 
@@ -100,7 +139,13 @@ void addIPv6Alias(char cid, uint tid, short dataLength, char* dataStart) {
 
 	char* args[32] = {"ifconfig", cmdtok[4], "inet6", "add", cmdtok[3], '\0' };
 
-	int status = executeArgs(args);
+	int success = executeArgs(args);
+
+	if(success) {
+		sendSuccess(cid, tid);
+	} else {
+		sendFailure(cid, tid);
+	}
 	return;
 }
 
@@ -123,6 +168,20 @@ void removeIPv6Alias(char cid, uint tid, short dataLength, char* dataStart) {
 
 	if(success) {
 		sendSuccess(cid, tid);
+	} else {
+		sendFailure(cid, tid);
+	}
+	return;
+}
+
+void showIPv6Alias(char cid, uint tid, short dataLength, char* dataStart) {
+
+	char* args[32] = { "ip", "addr", "show", '\0' };
+
+	int success = executeShow(args);
+
+	if(success) {
+		sendShow(cid, tid);
 	} else {
 		sendFailure(cid, tid);
 	}

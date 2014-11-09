@@ -1,4 +1,4 @@
-host1.team3.4516.cs.wpi.edu	robotnik
-host2.team3.4516.cs.wpi.edu	mean
-host3.team3.4516.cs.wpi.edu	bean
-host4.team3.4516.cs.wpi.edu	machine
+host1.team3.4516.cs.wpi.edu robotnik
+host2.team3.4516.cs.wpi.edu mean
+host3.team3.4516.cs.wpi.edu bean
+host4.team3.4516.cs.wpi.edu machine

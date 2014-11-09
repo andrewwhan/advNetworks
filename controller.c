@@ -36,6 +36,9 @@ struct hostInfo* loadDatabase(){
 		printf("name: %s,\n secret: %s,\n end: %d\n", host->hostName, host->secret, end); 
 
 	}
+	// Catches the last iteration of the loop where there is no data
+	free(prevHost->next);
+	prevHost->next = NULL;
 }
 
 void listenForHosts(){

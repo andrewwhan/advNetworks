@@ -11,10 +11,10 @@ struct hostInfo{
 };
 
 int main( int argc, char* argv[]){
-	struct hostInfo* hosts = loadDatabase(); //Read database file for host information
-	listenForHosts(); // listen to establish connections to hosts
+	struct hostInfo* hosts = loadDatabase();	//Read database file for host information
+	listenForHosts();							// listen to establish connections to hosts
 	
-	controllerCommandTerminal(); // start command line for user input
+	controllerCommandTerminal();				// start command line for user input
 }
 
 struct hostInfo* loadDatabase(){
@@ -23,18 +23,18 @@ struct hostInfo* loadDatabase(){
 	int end = 0;
 	struct hostInfo* firstHost = NULL;
 	struct hostInfo* prevHost = NULL;
-	while(end != EOF){
+	while(end != EOF) {
 		struct hostInfo* host = malloc(sizeof(struct hostInfo));
 		if(firstHost == NULL){
 			firstHost = host;
 			prevHost = host;
-		}
-		else{
+		} else {
 			prevHost->next = host;
 		}
 		
 		end = fscanf(dbFile, "%s %s", host->hostName, host->secret);
-		printf("name: %s,\n secret: %s,\n end: %d\n", host->hostName, host->secret, end);
+		printf("name: %s,\n secret: %s,\n end: %d\n", host->hostName, host->secret, end); 
+
 	}
 }
 

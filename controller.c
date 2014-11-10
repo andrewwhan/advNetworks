@@ -13,7 +13,7 @@ struct hostInfo{
 
 int main( int argc, char* argv[]){
 	struct hostInfo* hosts = loadDatabase();	//Read database file for host information
-	//listenForHosts(hosts);					// listen to establish connections to hosts
+	listenForHosts(hosts);					// listen to establish connections to hosts
 
 	
 	controllerCommandTerminal();				// start command line for user input
@@ -93,6 +93,7 @@ void listenForHosts(struct hostInfo* firstHost){
 						if(!strcmp(secret, currentHost->secret)){
 							currentHost->socket = commSocket;
 							hostFound = 1;
+							printf("Host %s connected! \n", hostName);
 						}
 						else{
 							//Invalid secret

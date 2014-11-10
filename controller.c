@@ -7,12 +7,14 @@ uint nextTid = 512;
 struct hostInfo{
 	char hostName[32];
 	char secret[16];
+	int socket;
 	struct hostInfo* next;
 };
 
 int main( int argc, char* argv[]){
 	struct hostInfo* hosts = loadDatabase();	//Read database file for host information
-	listenForHosts();							// listen to establish connections to hosts
+	//listenForHosts(hosts);					// listen to establish connections to hosts
+
 	
 	controllerCommandTerminal();				// start command line for user input
 }
@@ -39,9 +41,87 @@ struct hostInfo* loadDatabase(){
 	// Catches the last iteration of the loop where there is no data
 	free(prevHost->next);
 	prevHost->next = NULL;
+	return firstHost;
 }
 
-void listenForHosts(){
+void listenForHosts(struct hostInfo* firstHost){
+	char* port = "3875";
+	struct addrinfo hints, *res;
+	int listenSocket;
+	memset(&hints, 0, sizeof(hints));
+	hints.ai_family = AF_UNSPEC;
+	hints.ai_socktype = SOCK_STREAM;
+	hints.ai_flags = AI_PASSIVE;
+	int status = getaddrinfo(NULL, port, &hints, &res);
+	if(status != 0){
+		printf("getaddrinfo error: %s\n", gai_strerror(status));
+		return;
+	}
+	listenSocket = socket(res->ai_family, res->ai_socktype, res->ai_protocol);
+	if(listenSocket == -1){
+		printf("Socket error \n");
+		return;
+	}
+	if(bind(listenSocket, res->ai_addr, res->ai_addrlen) == -1){
+		printf("Bind error \n");
+		close(listenSocket);
+		return;
+	}
+	printf("Socket set up \n");
+	struct sockaddr_storage their_addr;
+	socklen_t addr_size;
+	int commSocket;
+	int waitHosts = 1; //If there are still unconnected hosts
+	while(waitHosts){
+		listen(listenSocket, 5);
+		addr_size = sizeof(their_addr);
+		commSocket = accept(listenSocket, (struct sockaddr *)&their_addr, &addr_size);
+		char* msg = malloc(1500*sizeof(char));
+		int returned = recv(commSocket, msg, 1500, 0);
+		if(returned > 0){
+			char cid = *msg;
+			uint tid = *(msg+1);
+			short dataLength = *(msg+5);
+			if(cid == 0x04){
+				char hostName[32];
+				char secret[16];
+				sscanf(msg+7, "%s %s", hostName, secret);
+				struct hostInfo* currentHost = firstHost;
+				int hostFound = 0;
+				while(currentHost != NULL){
+					if(!strcmp(hostName, currentHost->hostName)){
+						if(!strcmp(secret, currentHost->secret)){
+							currentHost->socket = commSocket;
+							hostFound = 1;
+						}
+						else{
+							//Invalid secret
+						}
+						break;
+					}
+					currentHost = currentHost->next;
+				}
+				if(hostFound){ //If the host was located check if there are still unconnected hosts
+					waitHosts = 0;
+					currentHost = firstHost;
+					while(currentHost != NULL){
+						if(currentHost->socket == 0){
+							waitHosts = 1;
+							break;
+						}
+					}
+				}
+				else{
+					close(commSocket);
+				}
+			}
+			else{
+				close(commSocket);
+			}
+		}
+		free(msg);
+	}
+	close(listenSocket);
 	return;
 }
 

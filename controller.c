@@ -12,13 +12,9 @@ struct hostInfo{
 };
 
 int main( int argc, char* argv[]){
-<<<<<<< HEAD
-	struct hostInfo* hosts = loadDatabase(); //Read database file for host information
-	//listenForHosts(hosts); // listen to establish connections to hosts
-=======
 	struct hostInfo* hosts = loadDatabase();	//Read database file for host information
-	listenForHosts();							// listen to establish connections to hosts
->>>>>>> 0a2fcbd0fd8486e7da726647be270753434a4b44
+	//listenForHosts(hosts);					// listen to establish connections to hosts
+
 	
 	controllerCommandTerminal();				// start command line for user input
 }

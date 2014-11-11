@@ -1,7 +1,7 @@
 #include "agent.h"
 
 int main(){
-	//controllerConnect();
+	controllerConnect();
 	return;
 }
 

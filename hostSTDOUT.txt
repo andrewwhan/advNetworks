@@ -10,7 +10,7 @@
        valid_lft forever preferred_lft forever
 3: wlan0: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc mq state UP group default qlen 1000
     link/ether 7c:e9:d3:f3:67:ba brd ff:ff:ff:ff:ff:ff
-    inet 130.215.223.54/21 brd 130.215.223.255 scope global wlan0
+    inet 130.215.10.40/21 brd 130.215.15.255 scope global wlan0
        valid_lft forever preferred_lft forever
     inet6 fe80::7ee9:d3ff:fef3:67ba/64 scope link 
        valid_lft forever preferred_lft forever

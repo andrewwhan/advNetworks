@@ -1,0 +1,9 @@
+#
+# My first shell script
+#
+#clear
+echo "Setting up host1"
+ssh -t cs4516@host1.team3.4516.cs.wpi.edu "sudo /root/shared/setupScripts/setupHost1"
+echo "Setting up host2"
+ssh -t cs4516@host2.team3.4516.cs.wpi.edu "sudo /root/shared/setupScripts/setupHost2"
+exit 0

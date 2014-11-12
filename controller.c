@@ -13,7 +13,7 @@ struct hostInfo{
 
 int main( int argc, char* argv[]){
 	struct hostInfo* hosts = loadDatabase();	//Read database file for host information
-	listenForHosts(hosts);					// listen to establish connections to hosts
+	//listenForHosts(hosts);					// listen to establish connections to hosts
 
 	
 	controllerCommandTerminal();				// start command line for user input
@@ -127,7 +127,7 @@ void listenForHosts(struct hostInfo* firstHost){
 }
 
 void controllerCommandTerminal() {
-	char cmdline [130];
+	char cmdline [514];
 	const char* delimiter = " \n";
 	char* cmdtok [32];
 	const char* cdstr = "cd";
@@ -135,8 +135,8 @@ void controllerCommandTerminal() {
 
 	while(1){ 								// start command loop
 		printf( "(^_^)> ");
-		fgets( cmdline, 129, stdin);
-		if( strlen( cmdline) < 128){ 		// ensure command is within certain length
+		fgets( cmdline, 512, stdin);
+		if( strlen( cmdline) < 513){ 		// ensure command is within certain length
 			if( feof( stdin)){									// for piping in file
 				printf( "exit\n");
 				exit( 0);
@@ -162,7 +162,7 @@ void controllerCommandTerminal() {
 			}
 		}
 		else{
-			printf("Please limit lines to 128 characters. \n");
+			printf("Please limit lines to 512 characters. \n");
 			char c = getc(stdin);
 			while(c != '\n' && c != EOF){
 				c = getc(stdin);

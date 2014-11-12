@@ -1,4 +1,6 @@
 *.o
 *.exe
 *~
+hostSTDOUT.txt
+hostSTDERR.txt
 ctrterminal

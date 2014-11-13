@@ -68,17 +68,18 @@ void listenForHosts(struct hostInfo* firstHost){
 		return;
 	}
 	printf("Socket set up \n");
-	struct sockaddr_storage their_addr;
-	socklen_t addr_size;
+	struct sockaddr_storage hostAddr;
+	socklen_t addrSize;
 	int commSocket;
 	int waitHosts = 1; //If there are still unconnected hosts
 	while(waitHosts){
 		listen(listenSocket, 5);
-		addr_size = sizeof(their_addr);
-		commSocket = accept(listenSocket, (struct sockaddr *)&their_addr, &addr_size);
+		addrSize = sizeof(hostAddr);
+		commSocket = accept(listenSocket, (struct sockaddr *)&hostAddr, &addrSize);
 		char* msg = malloc(1500*sizeof(char));
 		int returned = recv(commSocket, msg, 1500, 0);
 		if(returned > 0){
+			printf("Message Received, cid %02X \n", *msg);
 			char cid = *msg;
 			uint tid = *(msg+1);
 			short dataLength = *(msg+5);
@@ -87,6 +88,7 @@ void listenForHosts(struct hostInfo* firstHost){
 				char secret[16];
 				sscanf(msg+7, "%s %s", hostName, secret);
 				struct hostInfo* currentHost = firstHost;
+				printf("Hostname : %s \n Secret : %s \n", hostName, secret);
 				int hostFound = 0;
 				while(currentHost != NULL){
 					if(!strcmp(hostName, currentHost->hostName)){

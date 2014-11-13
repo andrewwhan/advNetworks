@@ -6,4 +6,5 @@
 #include <sys/socket.h>
 #include <netdb.h>
 
-void controllerConnect();
+int controllerConnect();
+void waitForCommands(int socket);

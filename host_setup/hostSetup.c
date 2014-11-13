@@ -8,7 +8,7 @@ void main() {
 	pid_t  pid;
 	int    status;
 	
-	char* args[] = {"ssh", "cs4516@host1.team3.4516.cs.wpi.edu", "/root/shared/setupScripts/setupHost1", '\0'};
+	char* args[] = {"ssh", "-t", "cs4516@host1.team3.4516.cs.wpi.edu", "\"sudo /root/shared/setupScripts/setupHost1\"", '\0'};
 	int i;
 	//for(i = 0; i < 4; i++){
 		if ((pid = fork()) < 0) {				/* fork a child process		*/

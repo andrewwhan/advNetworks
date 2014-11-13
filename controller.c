@@ -13,7 +13,8 @@ struct hostInfo{
 
 int main( int argc, char* argv[]){
 	struct hostInfo* hosts = loadDatabase();	//Read database file for host information
-	//listenForHosts(hosts);					// listen to establish connections to hosts
+	printf("First %s followed by %s \n", hosts->hostName, hosts->next->hostName);
+	listenForHosts(hosts);					// listen to establish connections to hosts
 
 	
 	controllerCommandTerminal();				// start command line for user input
@@ -26,21 +27,26 @@ struct hostInfo* loadDatabase(){
 	struct hostInfo* firstHost = NULL;
 	struct hostInfo* prevHost = NULL;
 	while(end != EOF) {
-		struct hostInfo* host = malloc(sizeof(struct hostInfo));
-		if(firstHost == NULL){
-			firstHost = host;
-			prevHost = host;
-		} else {
-			prevHost->next = host;
+		char hostName[32];
+		char secret[16];
+		end = fscanf(dbFile, "%s %s", hostName, secret);
+		if(end != EOF){
+			struct hostInfo* host = malloc(sizeof(struct hostInfo));
+			if(firstHost == NULL){
+				firstHost = host;
+				prevHost = host;
+			} else {
+				prevHost->next = host;
+				prevHost = host;
+			}
+			memcpy(host->hostName, hostName, 32);
+			memcpy(host->secret, secret, 16);
+			printf("name: %s,\n secret: %s,\n end: %d\n", host->hostName, host->secret, end); 
 		}
-		
-		end = fscanf(dbFile, "%s %s", host->hostName, host->secret);
-		printf("name: %s,\n secret: %s,\n end: %d\n", host->hostName, host->secret, end); 
-
+		else{
+			prevHost->next = NULL;
+		}
 	}
-	// Catches the last iteration of the loop where there is no data
-	free(prevHost->next);
-	prevHost->next = NULL;
 	return firstHost;
 }
 
@@ -86,7 +92,9 @@ void listenForHosts(struct hostInfo* firstHost){
 			if(cid == 0x04){
 				char hostName[32];
 				char secret[16];
+				memset(secret, 0, 16);
 				sscanf(msg+7, "%s %s", hostName, secret);
+				printf("secret: %s \n", secret);
 				struct hostInfo* currentHost = firstHost;
 				printf("Hostname : %s \n Secret : %s \n", hostName, secret);
 				int hostFound = 0;
@@ -100,6 +108,7 @@ void listenForHosts(struct hostInfo* firstHost){
 						else{
 							//Invalid secret
 						}
+						printf("Breaking");
 						break;
 					}
 					currentHost = currentHost->next;
@@ -109,9 +118,12 @@ void listenForHosts(struct hostInfo* firstHost){
 					currentHost = firstHost;
 					while(currentHost != NULL){
 						if(currentHost->socket == 0){
+							printf("Host not connected yet: %s \n", currentHost->hostName);
 							waitHosts = 1;
 							break;
 						}
+						printf("Iterating past %s to %s \n", currentHost->hostName, currentHost->next->hostName);
+						currentHost = currentHost->next;
 					}
 				}
 				else{
@@ -123,10 +135,13 @@ void listenForHosts(struct hostInfo* firstHost){
 			}
 		}
 		free(msg);
+		printf("Loop end \n");
 	}
 	close(listenSocket);
 	return;
 }
+
+
 
 void controllerCommandTerminal() {
 	char cmdline [514];

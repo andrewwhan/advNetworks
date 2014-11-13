@@ -51,8 +51,10 @@ int controllerConnect(){
 	*(msg + 1) = tid;
 
 	fscanf(dbFile, "%s %s", hostName, secret);
+	printf("Sending %s, %s \n", hostName, secret);
 	snprintf(msg + 7, sizeof(msg)-7, "%s %s", hostName, secret);
-	if(send(sockinfo, msg, 8 + strlen(hostName) + strlen(secret), 0) == -1){
+	*(msg + 8 + strlen(hostName) + strlen(secret)) = '\0';
+	if(send(sockinfo, msg, 9 + strlen(hostName) + strlen(secret), 0) == -1){
 		printf("Send error \n");
 		close(sockinfo);
 		return -1;

@@ -5,6 +5,8 @@
 #include <string.h>
 #include "hostCommands.h"
 
+#define HEADER 7
+
 void receiveCommand(char* messagePtr) {
 	char cid = *messagePtr;
 	uint tid = *(messagePtr + 1);
@@ -20,27 +22,31 @@ void receiveCommand(char* messagePtr) {
 
 	switch(cid){
 		case 0x00:
+			// Add alias command
 			addIPv6Alias(cid, tid, dataLength, dataStart);
 			break;
 		case 0x10:
-			removeIPv6Alias(cid, tid, dataLength, dataStart);
 			// Remove alias command
+			removeIPv6Alias(cid, tid, dataLength, dataStart);
 			break;
 		case 0x20:
-			showIPv6Alias(cid, tid, dataLength, dataStart);
 			// Show aliases command
+			showIPv6Alias(cid, tid, dataLength, dataStart);
 			break;
 		case 0x32:
 			// Request response from host command
 			break;
 		case 0x03:
 			// Add nat rule command
+			addNatRule(cid, tid, dataLength, dataStart);
 			break;
 		case 0x13:
 			// Remove nat rule command
+			removeNatRule(cid, tid, dataLength, dataStart);
 			break;
 		case 0x23:
 			// Show nat rules command
+			showNatRule(cid, tid, dataLength, dataStart);
 			break;
 		default:
 			break;
@@ -79,11 +85,12 @@ int executeArgs(char* args[]) {
 }
 
 int executeShow(char* args[]) {
+	printf("show\n");
 	FILE* soFile;
 	soFile = fopen("hostSTDOUT.txt", "w");
 	int status;
         pid_t   childpid;
-        
+
         if((childpid = fork()) == -1)
         {
                 perror("fork");
@@ -92,7 +99,6 @@ int executeShow(char* args[]) {
         if(childpid == 0)
         {
 		dup2(fileno(soFile), STDOUT_FILENO);
-		fclose(soFile);
 		if (execvp(args[0], args) < 0) {
 			printf("*** ERROR: exec failed\n");
 			exit(1);
@@ -102,25 +108,111 @@ int executeShow(char* args[]) {
         else
         {
 		while (wait(&status) != childpid);			/* wait for completion		*/
-		char textStuff[128];
-		char end = '0';
-		fclose(soFile);
         }
 	return !status; // convert to true/false value
 }
 
 void sendSuccess(char cid, uint tid) {
 	printf("success\n");
+
+	short dataLength = 0;
+	int msgLoc = 0;
+	char space = ' ';
+	char* successMessage = "Success! specified command was executed\0";
+
+	dataLength += strlen(successMessage) + 1;
+
+	char* messagePtr = malloc(sizeof(char) * (HEADER + dataLength));
+	memcpy(messagePtr + msgLoc, &cid, 1);
+	msgLoc++;
+	memcpy(messagePtr + msgLoc, &tid, sizeof(uint));
+	msgLoc += 4;
+	memcpy(messagePtr + msgLoc, &dataLength, sizeof(short));
+	msgLoc += 2;
+
+	memcpy(messagePtr + msgLoc, successMessage, strlen(successMessage));
+	memcpy(messagePtr + msgLoc + strlen(successMessage), &space, sizeof(char));
+	msgLoc += strlen(successMessage) + 1;
+
+	//for(i=0; i<msgLoc; i++){
+	//	printf("%02X \n", messagePtr[i]);
+	//}
+	fwrite(messagePtr, msgLoc, 1, stdout);
 	return;
 }
 
 void sendShow(char cid, uint tid) {
-	printf("show\n");
+	printf("show success\n");
+
+	FILE* soFile;
+	soFile = fopen("hostSTDOUT.txt", "r");
+	short dataLength = 0;
+	int msgLoc = 0;
+	char space = ' ';
+
+	char output[20][128];
+	int i = 0;
+
+	while(fgets(output[i], 128, soFile) != NULL) { //As long as there are still arguments
+		dataLength += strlen(output[i]) + 1;
+		i++;
+	}
+
+	char* messagePtr = malloc(sizeof(char) * (HEADER + dataLength));
+	memcpy(messagePtr + msgLoc, &cid, 1);
+	msgLoc++;
+	memcpy(messagePtr + msgLoc, &tid, sizeof(uint));
+	msgLoc += 4;
+	memcpy(messagePtr + msgLoc, &dataLength, sizeof(short));
+	msgLoc += 2;
+
+	i=0;
+	while(i<15){
+		memcpy(messagePtr + msgLoc, output[i], strlen(output[i]));
+		memcpy(messagePtr + msgLoc + strlen(output[i]), &space, sizeof(char));
+		msgLoc += strlen(output[i]) + 1;
+		i++;
+	}
+	printf("\n\n");
+	/*for(i=0; i<msgLoc; i++){
+		printf("%02X \n", messagePtr[i]);
+	}*/
+	fwrite(messagePtr, msgLoc, 1, stdout);
 	return;
 }
 
 void sendFailure(char cid, uint tid) {
 	printf("failure\n");
+	FILE* seFile;
+	seFile = fopen("hostSTDERR.txt", "r");
+	short dataLength = 0;
+	int msgLoc = 0;
+	char space = ' ';
+
+	char output[128];
+	int i = 0;
+
+	while(fgets(output, 128, seFile) != NULL) { //As long as there are still arguments
+		dataLength += strlen(output) + 1;
+	}
+	fclose(seFile);
+	char* messagePtr = malloc(sizeof(char) * (HEADER + dataLength));
+	memcpy(messagePtr + msgLoc, &cid, 1);
+	msgLoc++;
+	memcpy(messagePtr + msgLoc, &tid, sizeof(uint));
+	msgLoc += 4;
+	memcpy(messagePtr + msgLoc, &dataLength, sizeof(short));
+	msgLoc += 2;
+
+	memcpy(messagePtr + msgLoc, output, strlen(output));
+	memcpy(messagePtr + msgLoc + strlen(output), &space, sizeof(char));
+	msgLoc += strlen(output) + 1;
+
+	printf("\n\n");
+	/*for(i=0; i<msgLoc; i++){
+		printf("%02X \n", messagePtr[i]);
+	}*/
+	fwrite(messagePtr, msgLoc, 1, stdout);
 	return;
 }
 
@@ -153,6 +245,7 @@ void removeIPv6Alias(char cid, uint tid, short dataLength, char* dataStart) {
 	char* cmdtok [32];
 	const char* delimiter = " \n";
 	int tokcnt = 1;
+	int success;
 
 	cmdtok[0] = strtok( dataStart, delimiter);			// tokenize command
 	while( cmdtok[tokcnt-1]){
@@ -161,10 +254,15 @@ void removeIPv6Alias(char cid, uint tid, short dataLength, char* dataStart) {
 	}
 
 	printf("cmdtok: %s, %s, %s\n", cmdtok[0], cmdtok[4], cmdtok[3]);
+	
+	if(cmdtok[4] != NULL && cmdtok[3] != NULL) {
 
-	char* args[32] = {"ifconfig", cmdtok[4], "inet6", "del", cmdtok[3], '\0' };
+		char* args[32] = {"ifconfig", cmdtok[4], "inet6", "del", cmdtok[3], '\0' };
+		success = executeArgs(args);
+	} else {
+		success = 0;
+	}
 
-	int success = executeArgs(args);
 
 	if(success) {
 		sendSuccess(cid, tid);
@@ -177,6 +275,84 @@ void removeIPv6Alias(char cid, uint tid, short dataLength, char* dataStart) {
 void showIPv6Alias(char cid, uint tid, short dataLength, char* dataStart) {
 
 	char* args[32] = { "ip", "addr", "show", '\0' };
+
+	int success = executeShow(args);
+
+	if(success) {
+		sendShow(cid, tid);
+	} else {
+		sendFailure(cid, tid);
+	}
+	return;
+}
+
+void addNatRule(char cid, uint tid, short dataLength, char* dataStart) {
+	char* cmdtok [32];
+	const char* delimiter = " \n";
+	int tokcnt = 1;
+
+	cmdtok[0] = strtok( dataStart, delimiter);			// tokenize command
+	while( cmdtok[tokcnt-1]){
+		cmdtok[tokcnt] = strtok( NULL, delimiter);
+		tokcnt++;
+	}
+
+	printf("cmdtok: %s, %s, %s\n", cmdtok[0], cmdtok[4], cmdtok[3]);
+
+	char* args[32] = {"iptables", "-t", "nat", "-I", cmdtok[3], cmdtok[4], "-p", "tcp",
+		cmdtok[5], cmdtok[6], cmdtok[7], cmdtok[8], cmdtok[9], cmdtok[10], '\0' };
+	int i = 0;
+	while(args[i]){
+		printf("%s ", args[i]);
+		i++;
+	}
+	printf("\n");
+
+	int success = executeArgs(args);
+
+	if(success) {
+		sendSuccess(cid, tid);
+	} else {
+		sendFailure(cid, tid);
+	}
+	return;
+}
+
+void removeNatRule(char cid, uint tid, short dataLength, char* dataStart) {
+	char* cmdtok [32];
+	const char* delimiter = " \n";
+	int tokcnt = 1;
+
+	cmdtok[0] = strtok( dataStart, delimiter);			// tokenize command
+	while( cmdtok[tokcnt-1]){
+		cmdtok[tokcnt] = strtok( NULL, delimiter);
+		tokcnt++;
+	}
+
+	printf("cmdtok: %s, %s, %s\n", cmdtok[0], cmdtok[4], cmdtok[3]);
+
+	char* args[32] = {"iptables", "-t", "nat", "-D", cmdtok[3], cmdtok[4], "-p", "tcp",
+		cmdtok[5], cmdtok[6], cmdtok[7], cmdtok[8], cmdtok[9], cmdtok[10], '\0' };
+	int i = 0;
+	while(args[i]){
+		printf("%s ", args[i]);
+		i++;
+	}
+	printf("\n");
+
+	int success = executeArgs(args);
+
+	if(success) {
+		sendSuccess(cid, tid);
+	} else {
+		sendFailure(cid, tid);
+	}
+	return;
+}
+
+void showNatRule(char cid, uint tid, short dataLength, char* dataStart) {
+
+	char* args[32] = { "iptables", "-t", "nat", "-L", '\0' };
 
 	int success = executeShow(args);
 

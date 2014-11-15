@@ -1,9 +1,10 @@
 #include "agent.h"
+#include "hostCommands.h"
 
 int main(){
 	int socket;
 	if((socket = controllerConnect()) != -1){
-		//waitForCommand(socket);
+		waitForCommands(socket);
 	}
 	
 	return;
@@ -61,4 +62,16 @@ int controllerConnect(){
 	}
 
 	return sockinfo;
+}
+
+void waitForCommands(int socket) {
+	int returned = 1;
+	while (returned > 0) {
+		char* msg = malloc(1500*sizeof(char));
+		returned = recv(socket, msg, 1500, 0);
+		if (returned > 0) {
+			receiveCommand(msg, socket);
+		}
+	}
+	return;
 }

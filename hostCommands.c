@@ -7,7 +7,7 @@
 
 #define HEADER 7
 
-void receiveCommand(char* messagePtr) {
+void receiveCommand(char* messagePtr, int socket) {
 	char cid = *messagePtr;
 	uint tid = *(messagePtr + 1);
 	short dataLength = *(messagePtr + 5);
@@ -20,36 +20,53 @@ void receiveCommand(char* messagePtr) {
 	printf("dataLength:	%hd\n", dataLength);
 	printf("dataStart:	%s\n", dataStart);
 
+	int status;
+
 	switch(cid){
 		case 0x00:
 			// Add alias command
-			addIPv6Alias(cid, tid, dataLength, dataStart);
+			status = addIPv6Alias(cid, tid, dataLength, dataStart);
 			break;
 		case 0x10:
 			// Remove alias command
-			removeIPv6Alias(cid, tid, dataLength, dataStart);
+			status = removeIPv6Alias(cid, tid, dataLength, dataStart);
 			break;
 		case 0x20:
 			// Show aliases command
-			showIPv6Alias(cid, tid, dataLength, dataStart);
+			status = showIPv6Alias(cid, tid, dataLength, dataStart);
+			if( status) {
+				status = 3; // indicate that it is a show command that executed correctly
+			}
 			break;
 		case 0x32:
 			// Request response from host command
+			status = !0; // send success response
 			break;
 		case 0x03:
 			// Add nat rule command
-			addNatRule(cid, tid, dataLength, dataStart);
+			status = addNatRule(cid, tid, dataLength, dataStart);
 			break;
 		case 0x13:
 			// Remove nat rule command
-			removeNatRule(cid, tid, dataLength, dataStart);
+			status = removeNatRule(cid, tid, dataLength, dataStart);
 			break;
 		case 0x23:
 			// Show nat rules command
-			showNatRule(cid, tid, dataLength, dataStart);
+			status = showNatRule(cid, tid, dataLength, dataStart);
+			if( status) {
+				status = 3; // indicate that it is a show command that executed correctly
+			}
 			break;
 		default:
 			break;
+	}
+
+	if(status == 3) {
+		sendShow(cid, tid, socket);
+	} else if (status) {
+		sendSuccess(cid, tid, socket);
+	} else {
+		sendFailure(cid, tid, socket);
 	}
 	return;
 }
@@ -67,10 +84,10 @@ int executeArgs(char* args[]) {
 	pid_t  pid;
 	int    status;
 
-	if ((pid = fork()) < 0) {				/* fork a child process		*/
+	if ((pid = fork()) < 0) {					/* fork a child process		*/
 		printf("*** ERROR: forking child process failed\n");
 		exit(1);
-	} else if (pid == 0) {					/* for the child process:	*/
+	} else if (pid == 0) {						/* for the child process:	*/
 		dup2(fileno(seFile), STDERR_FILENO);
 		fclose(seFile);
 		if (execvp(args[0], args) < 0) {		/* execute the command		*/
@@ -78,7 +95,7 @@ int executeArgs(char* args[]) {
 			exit(1);
 		}
 		exit(0);
-	} else {						/* for the parent:		*/
+	} else {									/* for the parent:		*/
 		while (wait(&status) != pid);			/* wait for completion		*/
 	}
 	return !status; // convert to true/false value
@@ -112,7 +129,7 @@ int executeShow(char* args[]) {
 	return !status; // convert to true/false value
 }
 
-void sendSuccess(char cid, uint tid) {
+void sendSuccess(char cid, uint tid, int socket) {
 	printf("success\n");
 
 	short dataLength = 0;
@@ -134,14 +151,17 @@ void sendSuccess(char cid, uint tid) {
 	memcpy(messagePtr + msgLoc + strlen(successMessage), &space, sizeof(char));
 	msgLoc += strlen(successMessage) + 1;
 
-	//for(i=0; i<msgLoc; i++){
-	//	printf("%02X \n", messagePtr[i]);
-	//}
 	fwrite(messagePtr, msgLoc, 1, stdout);
+
+	if(send(socket, messagePtr, strlen(messagePtr), 0) == -1){
+		printf("Send error \n");
+		close(socket);
+		return;
+	}
 	return;
 }
 
-void sendShow(char cid, uint tid) {
+void sendShow(char cid, uint tid, int socket) {
 	printf("show success\n");
 
 	FILE* soFile;
@@ -174,14 +194,18 @@ void sendShow(char cid, uint tid) {
 		i++;
 	}
 	printf("\n\n");
-	/*for(i=0; i<msgLoc; i++){
-		printf("%02X \n", messagePtr[i]);
-	}*/
+
 	fwrite(messagePtr, msgLoc, 1, stdout);
+
+	if(send(socket, messagePtr, strlen(messagePtr), 0) == -1){
+		printf("Send error \n");
+		close(socket);
+		return;
+	}
 	return;
 }
 
-void sendFailure(char cid, uint tid) {
+void sendFailure(char cid, uint tid, int socket) {
 	printf("failure\n");
 	FILE* seFile;
 	seFile = fopen("hostSTDERR.txt", "r");
@@ -209,14 +233,17 @@ void sendFailure(char cid, uint tid) {
 	msgLoc += strlen(output) + 1;
 
 	printf("\n\n");
-	/*for(i=0; i<msgLoc; i++){
-		printf("%02X \n", messagePtr[i]);
-	}*/
+
 	fwrite(messagePtr, msgLoc, 1, stdout);
+	if(send(socket, messagePtr, strlen(messagePtr), 0) == -1){
+		printf("Send error \n");
+		close(socket);
+		return;
+	}
 	return;
 }
 
-void addIPv6Alias(char cid, uint tid, short dataLength, char* dataStart) {
+int addIPv6Alias(char cid, uint tid, short dataLength, char* dataStart) {
 	char* cmdtok [32];
 	const char* delimiter = " \n";
 	int tokcnt = 1;
@@ -233,15 +260,10 @@ void addIPv6Alias(char cid, uint tid, short dataLength, char* dataStart) {
 
 	int success = executeArgs(args);
 
-	if(success) {
-		sendSuccess(cid, tid);
-	} else {
-		sendFailure(cid, tid);
-	}
-	return;
+	return success;
 }
 
-void removeIPv6Alias(char cid, uint tid, short dataLength, char* dataStart) {
+int removeIPv6Alias(char cid, uint tid, short dataLength, char* dataStart) {
 	char* cmdtok [32];
 	const char* delimiter = " \n";
 	int tokcnt = 1;
@@ -263,30 +285,19 @@ void removeIPv6Alias(char cid, uint tid, short dataLength, char* dataStart) {
 		success = 0;
 	}
 
-
-	if(success) {
-		sendSuccess(cid, tid);
-	} else {
-		sendFailure(cid, tid);
-	}
-	return;
+	return success;
 }
 
-void showIPv6Alias(char cid, uint tid, short dataLength, char* dataStart) {
+int showIPv6Alias(char cid, uint tid, short dataLength, char* dataStart) {
 
-	char* args[32] = { "ip", "addr", "show", '\0' };
+	char* args[32] = { "ifconfig", '\0' };
 
 	int success = executeShow(args);
 
-	if(success) {
-		sendShow(cid, tid);
-	} else {
-		sendFailure(cid, tid);
-	}
-	return;
+	return success;
 }
 
-void addNatRule(char cid, uint tid, short dataLength, char* dataStart) {
+int addNatRule(char cid, uint tid, short dataLength, char* dataStart) {
 	char* cmdtok [32];
 	const char* delimiter = " \n";
 	int tokcnt = 1;
@@ -310,15 +321,10 @@ void addNatRule(char cid, uint tid, short dataLength, char* dataStart) {
 
 	int success = executeArgs(args);
 
-	if(success) {
-		sendSuccess(cid, tid);
-	} else {
-		sendFailure(cid, tid);
-	}
-	return;
+	return success;
 }
 
-void removeNatRule(char cid, uint tid, short dataLength, char* dataStart) {
+int removeNatRule(char cid, uint tid, short dataLength, char* dataStart) {
 	char* cmdtok [32];
 	const char* delimiter = " \n";
 	int tokcnt = 1;
@@ -342,24 +348,14 @@ void removeNatRule(char cid, uint tid, short dataLength, char* dataStart) {
 
 	int success = executeArgs(args);
 
-	if(success) {
-		sendSuccess(cid, tid);
-	} else {
-		sendFailure(cid, tid);
-	}
-	return;
+	return success;
 }
 
-void showNatRule(char cid, uint tid, short dataLength, char* dataStart) {
+int showNatRule(char cid, uint tid, short dataLength, char* dataStart) {
 
 	char* args[32] = { "iptables", "-t", "nat", "-L", '\0' };
 
 	int success = executeShow(args);
 
-	if(success) {
-		sendShow(cid, tid);
-	} else {
-		sendFailure(cid, tid);
-	}
-	return;
+	return success;
 }

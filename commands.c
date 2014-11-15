@@ -2,7 +2,7 @@
 #include <stdlib.h>
 #include <unistd.h>
 #include <string.h>
-#include "hostCommands.h"
+#include "commands.h"
 
 #define HEADER 7
 
@@ -33,13 +33,39 @@ void sendMessage(char cid, char** cmdArgs){
 		msgLoc += strlen(cmdArgs[i]) + 1;
 		i++;
 	}
-
-	// for(i=0; i<msgLoc; i++){
-	// 	printf("%02X \n", messagePtr[i]);
-	// }
-	//fwrite(messagePtr, msgLoc, 1, stdout);
 	
-	receiveCommand(messagePtr);
+	printf("send to host: %s\n", cmdArgs[2]);
+	//receiveCommand(messagePtr); // instead send the message through to host
+
+	int sockinfo = 1; // set sockinfo to socket of host specified in message
+
+	if(send(sockinfo, messagePtr, strlen(messagePtr), 0) == -1){
+		printf("Send error \n");
+		close(sockinfo);
+	} else {
+		awaitResponse(sockinfo);
+	}
+	return;
+}
+
+void awaitResponse( int sockinfo) {
+	char* msg = malloc(1500*sizeof(char));
+	int returned = recv(sockinfo, msg, 1500, 0);
+	if(returned > 0){
+		char cid = *msg;
+		uint tid = *(msg + 1);
+		short dataLength = *(msg + 5);
+		char* dataStart = msg + 7;
+
+		//printf("%02X, %u \n", cid, tid);
+
+		printf("cid:		%02X\n", cid);
+		printf("tid:		%u\n", tid);
+		printf("dataLength:	%hd\n", dataLength);
+		printf("dataStart:	%s\n", dataStart);
+	}
+	free(msg);
+	return;
 }
 
 void aliasCommand( char** cmdArgs) {
@@ -59,7 +85,6 @@ void aliasCommand( char** cmdArgs) {
 			return;
 	}
 	return;
-	
 }
 
 void responseCommand( char** cmdArgs) {

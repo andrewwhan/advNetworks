@@ -1,6 +1,5 @@
 #include "controller.h"
 #include "commands.h"
-#include "hostCommands.h"
 
 uint nextTid = 512;
 
@@ -14,7 +13,7 @@ struct hostInfo{
 int main( int argc, char* argv[]){
 	struct hostInfo* hosts = loadDatabase();	//Read database file for host information
 	printf("First %s followed by %s \n", hosts->hostName, hosts->next->hostName);
-	listenForHosts(hosts);					// listen to establish connections to hosts
+	//listenForHosts(hosts);					// listen to establish connections to hosts
 
 	
 	controllerCommandTerminal();				// start command line for user input

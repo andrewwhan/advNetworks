@@ -1,16 +1,17 @@
 all: controller agent
 
-controller: controller.c controller.h commands hostCommands
-	gcc controller.c commands.o hostCommands.o -o ctrterminal
+controller: controller.c controller.h commands
+	gcc controller.c commands.o -o ctrterminal
 
 commands: commands.c commands.h
 	gcc -c commands.c
 
+agent: agent.c agent.h hostCommands
+	gcc agent.c hostCommands.o -o agent
+
 hostCommands: hostCommands.c hostCommands.h
 	gcc -c hostCommands.c
 
-agent: agent.c agent.h
-	gcc agent.c -o agent
 
 clean:
 	rm -f ctrterminal agent *.o *.exe

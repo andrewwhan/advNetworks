@@ -40,6 +40,7 @@ struct hostInfo* loadDatabase(){
 			}
 			memcpy(host->hostName, hostName, 32);
 			memcpy(host->secret, secret, 16);
+			host->socket = 0;
 			printf("name: %s,\n secret: %s,\n end: %d\n", host->hostName, host->secret, end); 
 		}
 		else{
@@ -78,40 +79,65 @@ void listenForHosts(struct hostInfo* firstHost){
 	int commSocket;
 	int waitHosts = 1; //If there are still unconnected hosts
 	while(waitHosts){
-		listen(listenSocket, 5);
-		addrSize = sizeof(hostAddr);
-		commSocket = accept(listenSocket, (struct sockaddr *)&hostAddr, &addrSize);
-		char* msg = malloc(1500*sizeof(char));
-		int returned = recv(commSocket, msg, 1500, 0);
-		if(returned > 0){
-			printf("Message Received, cid %02X \n", *msg);
-			char cid = *msg;
-			uint tid = *(msg+1);
-			short dataLength = *(msg+5);
-			if(cid == 0x04){
-				char hostName[32];
-				char secret[16];
-				memset(secret, 0, 16);
-				sscanf(msg+7, "%s %s", hostName, secret);
-				printf("secret: %s \n", secret);
-				struct hostInfo* currentHost = firstHost;
-				printf("Hostname : %s \n Secret : %s \n", hostName, secret);
-				int hostFound = 0;
-				while(currentHost != NULL){
-					if(!strcmp(hostName, currentHost->hostName)){
-						if(!strcmp(secret, currentHost->secret)){
-							currentHost->socket = commSocket;
-							hostFound = 1;
-							printf("Host %s connected! \n", hostName);
-						}
-						else{
+		fd_set inputs;
+		int numfds;
+		FD_ZERO(&inputs);
+		FD_SET(0, &inputs); //stdin
+		FD_SET(listenSocket, &inputs); //listen socket
+		numfds = listenSocket;
+		struct hostInfo* currentHost = firstHost;
+		// while(currentHost != NULL){
+		// 	if(currentHost->socket != 0){
+		// 		FD_SET(currentHost->socket, &inputs);
+		// 		if(currentHost->socket > numfds){
+		// 			numfds = currentHost->socket;
+		// 		}
+		// 	}
+		// 	currentHost = currentHost->next;
+		// }
+		printf("selecting \n");
+		select(numfds+1, &inputs, NULL, NULL, NULL);
+		printf("finish selecting \n");
+		if(FD_ISSET(0, &inputs)){
+			printf("%c", getc(stdin));
+			printf("butts \n");
+		}
+		if(FD_ISSET(listenSocket, &inputs)){
+			printf("listenSocket file descriptor \n");
+			listen(listenSocket, 5);
+			addrSize = sizeof(hostAddr);
+			commSocket = accept(listenSocket, (struct sockaddr *)&hostAddr, &addrSize);
+			char* msg = malloc(1500*sizeof(char));
+			int returned = recv(commSocket, msg, 1500, 0);
+			if(returned > 0){
+				printf("Message Received, cid %02X \n", *msg);
+				char cid = *msg;
+				uint tid = *(msg+1);
+				short dataLength = *(msg+5);
+				if(cid == 0x04){
+					char hostName[32];
+					char secret[16];
+					memset(secret, 0, 16);
+					sscanf(msg+7, "%s %s", hostName, secret);
+					printf("secret: %s \n", secret);
+					struct hostInfo* currentHost = firstHost;
+					printf("Hostname : %s \n Secret : %s \n", hostName, secret);
+					int hostFound = 0;
+					while(currentHost != NULL){
+						if(!strcmp(hostName, currentHost->hostName)){
+							if(!strcmp(secret, currentHost->secret)){
+								currentHost->socket = commSocket;
+								hostFound = 1;
+								printf("Host %s connected! \n", hostName);
+							}
+							else{
 							//Invalid secret
+							}
+							printf("Breaking");
+							break;
 						}
-						printf("Breaking");
-						break;
+						currentHost = currentHost->next;
 					}
-					currentHost = currentHost->next;
-				}
 				if(hostFound){ //If the host was located check if there are still unconnected hosts
 					waitHosts = 0;
 					currentHost = firstHost;
@@ -119,6 +145,7 @@ void listenForHosts(struct hostInfo* firstHost){
 						if(currentHost->socket == 0){
 							printf("Host not connected yet: %s \n", currentHost->hostName);
 							waitHosts = 1;
+							printf(">> ");
 							break;
 						}
 						printf("Iterating past %s to %s \n", currentHost->hostName, currentHost->next->hostName);
@@ -136,56 +163,60 @@ void listenForHosts(struct hostInfo* firstHost){
 		free(msg);
 		printf("Loop end \n");
 	}
-	close(listenSocket);
-	return;
+
+}
+close(listenSocket);
+return;
 }
 
 
 
 void controllerCommandTerminal() {
 	char cmdline [514];
+	while(1){ 								// start command loop
+		printf( ">> ");
+		fgets( cmdline, 512, stdin);
+		parseCommandLine(cmdline);
+	}
+	exit(0);
+}
+
+void parseCommandLine(char* cmdline){
+	const char* exitstr = "exit";
 	const char* delimiter = " \n";
 	char* cmdtok [32];
-	const char* cdstr = "cd";
-	const char* exitstr = "exit";
-
-	while(1){ 								// start command loop
-		printf( "(^_^)> ");
-		fgets( cmdline, 512, stdin);
-		if( strlen( cmdline) < 513){ 		// ensure command is within certain length
-			if( feof( stdin)){									// for piping in file
-				printf( "exit\n");
-				exit( 0);
+	if( strlen( cmdline) < 513){ 		// ensure command is within certain length
+		if( feof( stdin)){									// for piping in file
+			printf( "exit\n");
+			exit( 0);
+		}
+		int tokcnt = 1;
+		cmdtok[0] = strtok( cmdline, delimiter);			// tokenize command
+		while( cmdtok[tokcnt-1]){
+			cmdtok[tokcnt] = strtok( NULL, delimiter);
+			tokcnt++;
+		}
+		if( tokcnt <= 32){									// ensure valid number of arguments
+			if(!cmdtok[0]){
 			}
-			int tokcnt = 1;
-			cmdtok[0] = strtok( cmdline, delimiter);			// tokenize command
-			while( cmdtok[tokcnt-1]){
-				cmdtok[tokcnt] = strtok( NULL, delimiter);
-				tokcnt++;
-			}
-			if( tokcnt <= 32){									// ensure valid number of arguments
-				if(!cmdtok[0]){
-				}
-				else if( !strcmp( cmdtok[0], exitstr)){
-					exit(0);
-				}
-				else{
-					executeUserCommand(cmdtok);					// execute the user command
-				}
+			else if( !strcmp( cmdtok[0], exitstr)){
+				exit(0);
 			}
 			else{
-				printf("Please limit input to 32 arguments. \n");
+				executeUserCommand(cmdtok);					// execute the user command
 			}
 		}
 		else{
-			printf("Please limit lines to 512 characters. \n");
-			char c = getc(stdin);
-			while(c != '\n' && c != EOF){
-				c = getc(stdin);
-			}
+			printf("Please limit input to 32 arguments. \n");
 		}
 	}
-	exit(0);
+	else{
+		printf("Please limit lines to 512 characters. \n");
+		char c = getc(stdin);
+		while(c != '\n' && c != EOF){
+			c = getc(stdin);
+		}
+	}
 }
 
 void executeUserCommand( char* cmdArgs[32]) {
@@ -195,20 +226,20 @@ void executeUserCommand( char* cmdArgs[32]) {
 		int indexOfCommand = getCommandIndex( cmdArgs[0]);
 		switch ( indexOfCommand) {
 			case 0:										// alias command
-				printf( "alias command\n");
-				aliasCommand( cmdArgs);
-				break;
+			printf( "alias command\n");
+			aliasCommand( cmdArgs);
+			break;
 			case 1:										// request command
-				printf( "request response command\n");
-				responseCommand( cmdArgs);
-				break;
+			printf( "request response command\n");
+			responseCommand( cmdArgs);
+			break;
 			case 2:										// nat command
-				printf( "nat command\n");
-				natCommand( cmdArgs);
-				break;
+			printf( "nat command\n");
+			natCommand( cmdArgs);
+			break;
 			case -1:									// error: command name not recognized
-				printf( "not valid command\n");
-				break;
+			printf( "not valid command\n");
+			break;
 		}
 	}
 	return;

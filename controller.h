@@ -10,5 +10,6 @@ struct hostInfo;
 struct hostInfo* loadDatabase();
 void listenForHosts();
 void controllerCommandTerminal();
+void parseCommandLine();
 void executeUserCommand(char* cmdArgs[32]);
 int getCommandIndex(char* cmdName);

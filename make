@@ -1,5 +1,5 @@
 rm -f ctrterminal agent *.o *.exe
-gcc agent.c -o agent
 gcc -c hostCommands.c
+gcc agent.c hostCommands.o -o agent
 gcc -c commands.c
-gcc controller.c commands.o hostCommands.o -o ctrterminal
+gcc controller.c commands.o -o ctrterminal

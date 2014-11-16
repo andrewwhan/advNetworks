@@ -3,9 +3,9 @@ do
 echo "Compiling host $i"
 sudo scp -r /media/sf_cs4516 cs4516@10.45.3.$i:~
 case $i in
-1) ssh cs4516@10.45.3.$i cd sf_cs4516 ; sudo ifconfig eth0 inet6 add 2607:f5c0:8010:c0de:4516:3:0:1/112 ; sudo apt-get install make ;;
-2) ssh cs4516@10.45.3.$i cd sf_cs4516 ; sudo ifconfig eth0 inet6 add 2607:f5c0:8010:c0de:4516:3:0:2/112 ; sudo apt-get install make ;;
-3) ssh cs4516@10.45.3.$i cd sf_cs4516 ; sudo ifconfig eth0 inet6 add 2607:f5c0:8010:c0de:4516:3:0:3/112 ; sudo apt-get install make ;;
-4) ssh cs4516@10.45.3.$i cd sf_cs4516 ; sudo ifconfig eth0 inet6 add 2607:f5c0:8010:c0de:4516:3:0:4/112 ; sudo apt-get install make ;;
+1) ssh cs4516@10.45.3.$i cd sf_cs4516 ; sudo apt-get update ; sudo apt-get install make ;;
+2) ssh cs4516@10.45.3.$i cd sf_cs4516 ; sudo apt-get update ; sudo apt-get install make ;;
+3) ssh cs4516@10.45.3.$i cd sf_cs4516 ; sudo apt-get update ; sudo apt-get install make ;;
+4) ssh cs4516@10.45.3.$i cd sf_cs4516 ; sudo apt-get update ; sudo apt-get install make ;;
 esac
 done

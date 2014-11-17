@@ -2,6 +2,7 @@
 #include "commands.h"
 
 uint nextTid = 512;
+struct hostInfo* firstHost;
 
 struct hostInfo{
 	char hostName[32];
@@ -11,9 +12,9 @@ struct hostInfo{
 };
 
 int main( int argc, char* argv[]){
-	struct hostInfo* hosts = loadDatabase();	//Read database file for host information
+	firstHost = loadDatabase();	//Read database file for host information
 	printf("First %s followed by %s \n", hosts->hostName, hosts->next->hostName);
-	//listenForHosts(hosts);					// listen to establish connections to hosts
+	listenForHosts();					// listen to establish connections to hosts
 
 	
 	controllerCommandTerminal();				// start command line for user input
@@ -50,7 +51,7 @@ struct hostInfo* loadDatabase(){
 	return firstHost;
 }
 
-void listenForHosts(struct hostInfo* firstHost){
+void listenForHosts(){
 	char* port = "3875";
 	struct addrinfo hints, *res;
 	int listenSocket;

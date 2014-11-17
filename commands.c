@@ -8,6 +8,7 @@
 
 void sendMessage(char cid, char** cmdArgs){
 	extern uint nextTid;
+	extern struct hostInfo* firstHost;
 
 	int i = 0;
 	short dataLength = 0;

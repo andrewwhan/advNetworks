@@ -70,7 +70,11 @@ void waitForCommands(int socket) {
 		char* msg = malloc(1500*sizeof(char));
 		returned = recv(socket, msg, 1500, 0);
 		if (returned > 0) {
+			printf("one command recieved");
 			receiveCommand(msg, socket);
+		}
+		else{
+			printf("recv error");
 		}
 	}
 	return;

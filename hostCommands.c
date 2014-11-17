@@ -151,9 +151,11 @@ void sendSuccess(char cid, uint tid, int socket) {
 	memcpy(messagePtr + msgLoc + strlen(successMessage), &space, sizeof(char));
 	msgLoc += strlen(successMessage) + 1;
 
+	*(messagePtr + 7 + dataLength) = '\0';
+
 	fwrite(messagePtr, msgLoc, 1, stdout);
 
-	if(send(socket, messagePtr, strlen(messagePtr), 0) == -1){
+	if(send(socket, messagePtr, 7+dataLength, 0) == -1){
 		printf("Send error \n");
 		close(socket);
 		return;
@@ -175,14 +177,17 @@ void sendShow(char cid, uint tid, int socket) {
 
 	while(fgets(output[i], 128, soFile) != NULL) { //As long as there are still arguments
 		dataLength += strlen(output[i]) + 1;
+		printf("current dataLength: %d of output: %s\n", dataLength, output[i]);
 		i++;
 	}
+
 
 	char* messagePtr = malloc(sizeof(char) * (HEADER + dataLength));
 	memcpy(messagePtr + msgLoc, &cid, 1);
 	msgLoc++;
 	memcpy(messagePtr + msgLoc, &tid, sizeof(uint));
 	msgLoc += 4;
+	printf("later dataLength: %d\n", dataLength);
 	memcpy(messagePtr + msgLoc, &dataLength, sizeof(short));
 	msgLoc += 2;
 
@@ -193,11 +198,12 @@ void sendShow(char cid, uint tid, int socket) {
 		msgLoc += strlen(output[i]) + 1;
 		i++;
 	}
+	*(messagePtr + 7 + dataLength) = '\0';
 	printf("\n\n");
 
 	fwrite(messagePtr, msgLoc, 1, stdout);
 
-	if(send(socket, messagePtr, strlen(messagePtr), 0) == -1){
+	if(send(socket, messagePtr, 7+dataLength, 0) == -1){
 		printf("Send error \n");
 		close(socket);
 		return;
@@ -231,11 +237,11 @@ void sendFailure(char cid, uint tid, int socket) {
 	memcpy(messagePtr + msgLoc, output, strlen(output));
 	memcpy(messagePtr + msgLoc + strlen(output), &space, sizeof(char));
 	msgLoc += strlen(output) + 1;
-
+	*(messagePtr + 7 + dataLength) = '\0';
 	printf("\n\n");
 
 	fwrite(messagePtr, msgLoc, 1, stdout);
-	if(send(socket, messagePtr, strlen(messagePtr), 0) == -1){
+	if(send(socket, messagePtr, 7+dataLength, 0) == -1){
 		printf("Send error \n");
 		close(socket);
 		return;

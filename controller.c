@@ -13,7 +13,7 @@ struct hostInfo{
 
 int main( int argc, char* argv[]){
 	firstHost = loadDatabase();	//Read database file for host information
-	printf("First %s followed by %s \n", hosts->hostName, hosts->next->hostName);
+	//printf("First %s followed by %s \n", hosts->hostName, hosts->next->hostName);
 	listenForHosts();					// listen to establish connections to hosts
 	controllerCommandTerminal();				// start command line for user input
 }
@@ -164,6 +164,7 @@ void listenForHosts(){
 	}
 
 }
+printf("closing listen socket cause no more hosts \n");
 close(listenSocket);
 return;
 }
@@ -255,7 +256,7 @@ int getCommandIndex( char* cmdName) {
 	return -1; 			// failed to identify command
 }
 
-int getSocketByName(char* hostName, struct hostInfo* firstHost){
+int getSocketByName(char* hostName){
 	struct hostInfo* currentHost = firstHost;
 	while(currentHost != NULL){
 		if(!strcmp(hostName, currentHost->hostName)){

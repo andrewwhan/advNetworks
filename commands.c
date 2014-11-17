@@ -1,8 +1,5 @@
-#include <stdio.h>
-#include <stdlib.h>
-#include <unistd.h>
-#include <string.h>
 #include "commands.h"
+#include "controller.h"
 
 #define HEADER 7
 
@@ -37,13 +34,18 @@ void sendMessage(char cid, char** cmdArgs){
 	
 	printf("send to host: %s\n", cmdArgs[2]);
 	//receiveCommand(messagePtr); // instead send the message through to host
-
-	int sockinfo = 1; // set sockinfo to socket of host specified in message
-
-	if(send(sockinfo, messagePtr, strlen(messagePtr), 0) == -1){
+	int sockinfo = getSocketByName(cmdArgs[1]); 
+	if(sockinfo < 0){
+		sockinfo = getSocketByName(cmdArgs[2]);
+	}
+	
+	int hi;
+	if(hi = send(sockinfo, messagePtr, 7+dataLength, 0) == -1){
 		printf("Send error \n");
 		close(sockinfo);
 	} else {
+		printf("successfully sent\n");
+		printf("%d \n", hi);
 		awaitResponse(sockinfo);
 	}
 	return;

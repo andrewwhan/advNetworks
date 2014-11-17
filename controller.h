@@ -13,4 +13,4 @@ void controllerCommandTerminal();
 void parseCommandLine();
 void executeUserCommand(char* cmdArgs[32]);
 int getCommandIndex(char* cmdName);
-int getSocketByName(char* hostName, struct hostInfo* firstHost);
+int getSocketByName(char* hostName);

@@ -1,4 +1,4 @@
-void receiveCommand();
+void receiveCommand(char* messagePtr, int socket);
 int executeArgs(char* args[]);
 int executeShow(char* args[]);
 int addIPv6Alias(char cid, uint tid, short dataLength, char* dataStart);

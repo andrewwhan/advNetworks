@@ -3,9 +3,9 @@ do
 echo "Compiling host $i"
 sudo scp -r /media/sf_cs4516 cs4516@10.45.3.$i:~
 case $i in
-1) ssh cs4516@10.45.3.$i 'echo "host1.team3.4516.cs.wpi.edu robotnik" > sf_cs4516/credentials.txt ; cd sf_cs4516 ; make ; ./agent';;
-2) ssh cs4516@10.45.3.$i 'echo "host2.team3.4516.cs.wpi.edu mean" > sf_cs4516/credentials.txt ; cd sf_cs4516 ; make ; ./agent';;
-3) ssh cs4516@10.45.3.$i 'echo "host3.team3.4516.cs.wpi.edu bean" > sf_cs4516/credentials.txt ; cd sf_cs4516 ; make ; ./agent';;
-4) ssh cs4516@10.45.3.$i 'echo "host4.team3.4516.cs.wpi.edu machine" > sf_cs4516/credentials.txt ; cd sf_cs4516 ; make ; ./agent';;
+1) ssh cs4516@10.45.3.$i 'echo "host1.team3.4516.cs.wpi.edu robotnik" > sf_cs4516/credentials.txt ; cd sf_cs4516 ; make agent ; ./agent';;
+2) ssh cs4516@10.45.3.$i 'echo "host2.team3.4516.cs.wpi.edu mean" > sf_cs4516/credentials.txt ; cd sf_cs4516 ; make agent ; ./agent';;
+3) ssh cs4516@10.45.3.$i 'echo "host3.team3.4516.cs.wpi.edu bean" > sf_cs4516/credentials.txt ; cd sf_cs4516 ; make agent ; ./agent';;
+4) ssh cs4516@10.45.3.$i 'echo "host4.team3.4516.cs.wpi.edu machine" > sf_cs4516/credentials.txt ; cd sf_cs4516 ; make agent ; ./agent';;
 esac
 done

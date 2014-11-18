@@ -74,17 +74,20 @@ void awaitResponse( int sockinfo) {
 void aliasCommand( char** cmdArgs) {
 	int commandIndex = getCommandIndexASR( cmdArgs[1]);
 	switch (commandIndex) {
-		case 0:			// add 0x0
-			sendMessage(0x00, cmdArgs);
+		case 0:			// add 0x0, expected args count = 5
+			if (countArgs(cmdArgs) == 5) sendMessage(0x00, cmdArgs);
+			else printf("Format error. Try using: alias add [HOSTNAME] [IP ADDRESS] [INTERFACE]\n");
 			break;
-		case 1:			// remove 0x1
-			sendMessage(0x10, cmdArgs);
+		case 1:			// remove 0x1, expected args count = 5
+			if (countArgs(cmdArgs) == 5) sendMessage(0x10, cmdArgs);
+			else printf("Format error. Try using: alias remove [HOSTNAME] [IP ADDRESS] [INTERFACE]\n");
 			break;
-		case 2:			// show 0x2
-			sendMessage(0x20, cmdArgs);
+		case 2:			// show 0x2, expected args count = 3
+			if(countArgs(cmdArgs) == 3) sendMessage(0x20, cmdArgs);
+			else printf("Format error. Try using: alias show [HOSTNAME]\n");
 			break;
 		case -1:
-			printf("invalid command: add, show, remove\n");
+			printf("Invalid alias command. Try using: add, show, remove\n");
 			return;
 	}
 	return;
@@ -112,17 +115,26 @@ void responseCommand( char** cmdArgs) {
 void natCommand( char** cmdArgs) {
 	int commandIndex = getCommandIndexASR( cmdArgs[1]);
 	switch (commandIndex) {
-		case 0:			// add
-			sendMessage(0x03, cmdArgs);
+		case 0:			// add, expected args count = 10
+			if (countArgs(cmdArgs) == 11) sendMessage(0x03, cmdArgs);
+			else {
+				printf("Format error. Try using: nat add [HOSTNAME] ");
+				printf("[CHAIN] [POSITION] -d [DEST IP] -j DNAT --to-destination [NEW DEST IP]\n");
+			}
 			break;
-		case 1:			// remove
-			sendMessage(0x13, cmdArgs);
+		case 1:			// remove, expected args count = 10
+			if (countArgs(cmdArgs) == 11) sendMessage(0x13, cmdArgs);
+			else {
+				printf("Format error. Try using: nat remove [HOSTNAME] ");
+				printf("[CHAIN] [POSITION] -d [DEST IP] -j DNAT --to-destination [NEW DEST IP]\n");
+			}
 			break;
-		case 2:			// show
-			sendMessage(0x23, cmdArgs);
+		case 2:			// show, expected args count = 3
+			if (countArgs(cmdArgs) == 3) sendMessage(0x23, cmdArgs);
+			else printf("Incorrect format. Use: nat show [HOSTNAME]\n");
 			break;
 		case -1:
-			printf("invalid command: add, show, remove\n");
+			printf("Invalid nat command. Try using: add, show, remove\n");
 			return;
 	}
 	return;
@@ -137,4 +149,10 @@ int getCommandIndexASR( char* cmdName) {
 		}
 	}
 	return -1; 			// failed to identify command
+}
+
+int countArgs( char** cmdArgs) {
+	int i = 0;
+	while( cmdArgs[i] != '\0' ) i++;
+	return i;
 }

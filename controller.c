@@ -14,7 +14,7 @@ struct hostInfo{
 int main( int argc, char* argv[]){
 	firstHost = loadDatabase();	//Read database file for host information
 	//printf("First %s followed by %s \n", hosts->hostName, hosts->next->hostName);
-	listenForHosts();					// listen to establish connections to hosts
+	//listenForHosts();					// listen to establish connections to hosts
 	controllerCommandTerminal();				// start command line for user input
 }
 
@@ -226,15 +226,15 @@ void executeUserCommand( char* cmdArgs[32]) {
 		int indexOfCommand = getCommandIndex( cmdArgs[0]);
 		switch ( indexOfCommand) {
 			case 0:										// alias command
-			printf( "alias command\n");
+			//printf( "alias command\n");
 			aliasCommand( cmdArgs);
 			break;
 			case 1:										// request command
-			printf( "request response command\n");
+			//printf( "request response command\n");
 			responseCommand( cmdArgs);
 			break;
 			case 2:										// nat command
-			printf( "nat command\n");
+			//printf( "nat command\n");
 			natCommand( cmdArgs);
 			break;
 			case -1:									// error: command name not recognized

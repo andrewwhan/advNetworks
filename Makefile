@@ -1,7 +1,7 @@
 all: controller agent
 
 controller: controller.c controller.h commands
-	gcc controller.c commands.o -o ctrterminal
+	gcc controller.c commands.o -o controller
 
 commands: commands.c commands.h
 	gcc -c commands.c

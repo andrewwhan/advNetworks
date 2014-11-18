@@ -14,4 +14,4 @@ hostCommands: hostCommands.c hostCommands.h
 
 
 clean:
-	rm -f ctrterminal agent *.o *.exe
+	rm -f controller agent hostSTDERR.txt hostSTDOUT.txt *.o *.exe

@@ -3,4 +3,5 @@
 *~
 hostSTDOUT.txt
 hostSTDERR.txt
-ctrterminal
+controller
+agent

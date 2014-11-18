@@ -1,7 +1,8 @@
 #include "controller.h"
 #include "commands.h"
+#include <errno.h>
 
-uint nextTid = 512;
+uint nextTid = 1351;
 struct hostInfo* firstHost;
 
 struct hostInfo{
@@ -14,7 +15,7 @@ struct hostInfo{
 int main( int argc, char* argv[]){
 	firstHost = loadDatabase();	//Read database file for host information
 	//printf("First %s followed by %s \n", hosts->hostName, hosts->next->hostName);
-	//listenForHosts();					// listen to establish connections to hosts
+	listenForHosts();					// listen to establish connections to hosts
 	controllerCommandTerminal();				// start command line for user input
 }
 
@@ -63,12 +64,13 @@ void listenForHosts(){
 		return;
 	}
 	listenSocket = socket(res->ai_family, res->ai_socktype, res->ai_protocol);
+	printf("open socket %d \n", listenSocket);
 	if(listenSocket == -1){
 		printf("Socket error \n");
 		return;
 	}
 	if(bind(listenSocket, res->ai_addr, res->ai_addrlen) == -1){
-		printf("Bind error \n");
+		printf("Bind error %s\n", strerror(errno));
 		close(listenSocket);
 		return;
 	}
@@ -106,6 +108,7 @@ void listenForHosts(){
 			listen(listenSocket, 5);
 			addrSize = sizeof(hostAddr);
 			commSocket = accept(listenSocket, (struct sockaddr *)&hostAddr, &addrSize);
+			printf("open commsocket %d \n", commSocket);
 			char* msg = malloc(1500*sizeof(char));
 			int returned = recv(commSocket, msg, 1500, 0);
 			if(returned > 0){
@@ -128,6 +131,7 @@ void listenForHosts(){
 								currentHost->socket = commSocket;
 								hostFound = 1;
 								printf("Host %s connected! \n", hostName);
+								printf("storing commsocket %d \n", commSocket);
 							}
 							else{
 							//Invalid secret
@@ -137,36 +141,38 @@ void listenForHosts(){
 						}
 						currentHost = currentHost->next;
 					}
-				if(hostFound){ //If the host was located check if there are still unconnected hosts
-					waitHosts = 0;
-					currentHost = firstHost;
-					while(currentHost != NULL){
-						if(currentHost->socket == 0){
-							printf("Host not connected yet: %s \n", currentHost->hostName);
-							waitHosts = 1;
-							printf(">> ");
-							break;
+					if(hostFound){ //If the host was located check if there are still unconnected hosts
+						waitHosts = 0;
+						currentHost = firstHost;
+						while(currentHost != NULL){
+							if(currentHost->socket == 0){
+								printf("Host not connected yet: %s \n", currentHost->hostName);
+								waitHosts = 1;
+								printf(">> ");
+								break;
+							}
+							printf("Iterating past %s to %s \n", currentHost->hostName, currentHost->next->hostName);
+							currentHost = currentHost->next;
 						}
-						printf("Iterating past %s to %s \n", currentHost->hostName, currentHost->next->hostName);
-						currentHost = currentHost->next;
+					}
+					else{
+						printf("early terminating commsocket %d \n", commSocket);
+						close(commSocket);
 					}
 				}
 				else{
+					printf("early terminating commsocket %d \n", commSocket);
 					close(commSocket);
 				}
 			}
-			else{
-				close(commSocket);
-			}
+			free(msg);
+			printf("Loop end \n");
 		}
-		free(msg);
-		printf("Loop end \n");
-	}
 
-}
-printf("closing listen socket cause no more hosts \n");
-close(listenSocket);
-return;
+	}
+	printf("closing listen socket cause no more hosts %d \n", listenSocket);
+	close(listenSocket);
+	return;
 }
 
 
@@ -200,6 +206,12 @@ void parseCommandLine(char* cmdline){
 			if(!cmdtok[0]){
 			}
 			else if( !strcmp( cmdtok[0], exitstr)){
+				struct hostInfo* currentHost = firstHost;
+				while(currentHost != NULL){
+					printf("close commsocket %d \n", currentHost->socket);
+					close(currentHost->socket);
+					currentHost = currentHost->next;
+				}
 				exit(0);
 			}
 			else{

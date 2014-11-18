@@ -9,8 +9,8 @@
 
 void receiveCommand(char* messagePtr, int socket) {
 	char cid = *messagePtr;
-	uint tid = *(messagePtr + 1);
-	short dataLength = *(messagePtr + 5);
+	uint tid = *(uint*)(messagePtr + 1);
+	short dataLength = *(short*)(messagePtr + 5);
 	char* dataStart = messagePtr + 7;
 
 	//printf("%02X, %u \n", cid, tid);
@@ -19,6 +19,10 @@ void receiveCommand(char* messagePtr, int socket) {
 	printf("tid:		%u\n", tid);
 	printf("dataLength:	%hd\n", dataLength);
 	printf("dataStart:	%s\n", dataStart);
+	int i;
+	for(i=0; i<7; i++){
+		printf("%02X \n", messagePtr[i]);
+	}
 
 	int status;
 
@@ -154,6 +158,7 @@ void sendSuccess(char cid, uint tid, int socket) {
 	*(messagePtr + 7 + dataLength) = '\0';
 
 	fwrite(messagePtr, msgLoc, 1, stdout);
+	printf("\n %hd \n", *(messagePtr + 5));
 
 	if(send(socket, messagePtr, 7+dataLength, 0) == -1){
 		printf("Send error \n");
@@ -176,18 +181,17 @@ void sendShow(char cid, uint tid, int socket) {
 	int i = 0;
 
 	while(fgets(output[i], 128, soFile) != NULL) { //As long as there are still arguments
-		dataLength += strlen(output[i]) + 1;
-		printf("current dataLength: %d of output: %s\n", dataLength, output[i]);
+		dataLength += (short)strlen(output[i]) + 1;
+		//printf("current dataLength: %hd of output: %s", dataLength, output[i]);
 		i++;
 	}
-
+	//printf("\n");
 
 	char* messagePtr = malloc(sizeof(char) * (HEADER + dataLength));
 	memcpy(messagePtr + msgLoc, &cid, 1);
 	msgLoc++;
 	memcpy(messagePtr + msgLoc, &tid, sizeof(uint));
 	msgLoc += 4;
-	printf("later dataLength: %d\n", dataLength);
 	memcpy(messagePtr + msgLoc, &dataLength, sizeof(short));
 	msgLoc += 2;
 
@@ -202,6 +206,7 @@ void sendShow(char cid, uint tid, int socket) {
 	printf("\n\n");
 
 	fwrite(messagePtr, msgLoc, 1, stdout);
+	printf("\n %hd \n", *(messagePtr + 5));
 
 	if(send(socket, messagePtr, 7+dataLength, 0) == -1){
 		printf("Send error \n");
@@ -316,7 +321,7 @@ int addNatRule(char cid, uint tid, short dataLength, char* dataStart) {
 
 	printf("cmdtok: %s, %s, %s\n", cmdtok[0], cmdtok[4], cmdtok[3]);
 
-	char* args[32] = {"iptables", "-t", "nat", "-I", cmdtok[3], cmdtok[4], "-p", "tcp",
+	char* args[32] = {"ip6tables", "-t", "nat", "-I", cmdtok[3], cmdtok[4], "-p", "tcp",
 		cmdtok[5], cmdtok[6], cmdtok[7], cmdtok[8], cmdtok[9], cmdtok[10], '\0' };
 	int i = 0;
 	while(args[i]){
@@ -343,8 +348,8 @@ int removeNatRule(char cid, uint tid, short dataLength, char* dataStart) {
 
 	printf("cmdtok: %s, %s, %s\n", cmdtok[0], cmdtok[4], cmdtok[3]);
 
-	char* args[32] = {"iptables", "-t", "nat", "-D", cmdtok[3], cmdtok[4], "-p", "tcp",
-		cmdtok[5], cmdtok[6], cmdtok[7], cmdtok[8], cmdtok[9], cmdtok[10], '\0' };
+	char* args[32] = {"ip6tables", "-t", "nat", "-D", cmdtok[3], "-p", "tcp",
+		cmdtok[4], cmdtok[5], cmdtok[6], cmdtok[7], cmdtok[8], cmdtok[9], '\0' };
 	int i = 0;
 	while(args[i]){
 		printf("%s ", args[i]);
@@ -359,7 +364,7 @@ int removeNatRule(char cid, uint tid, short dataLength, char* dataStart) {
 
 int showNatRule(char cid, uint tid, short dataLength, char* dataStart) {
 
-	char* args[32] = { "iptables", "-t", "nat", "-L", '\0' };
+	char* args[32] = { "ip6tables", "-t", "nat", "-L", '\0' };
 
 	int success = executeShow(args);
 

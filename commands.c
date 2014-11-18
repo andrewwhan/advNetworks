@@ -31,7 +31,9 @@ void sendMessage(char cid, char** cmdArgs){
 		msgLoc += strlen(cmdArgs[i]) + 1;
 		i++;
 	}
-	
+	// for(i=0; i<msgLoc; i++){
+	// 	printf("%02X \n", messagePtr[i]);
+	// }
 	printf("send to host: %s\n", cmdArgs[2]);
 	//receiveCommand(messagePtr); // instead send the message through to host
 	int sockinfo = getSocketByName(cmdArgs[1]); 
@@ -39,13 +41,11 @@ void sendMessage(char cid, char** cmdArgs){
 		sockinfo = getSocketByName(cmdArgs[2]);
 	}
 	
-	int hi;
-	if(hi = send(sockinfo, messagePtr, 7+dataLength, 0) == -1){
+	if(send(sockinfo, messagePtr, 7+dataLength, 0) == -1){
 		printf("Send error \n");
 		close(sockinfo);
 	} else {
 		printf("successfully sent\n");
-		printf("%d \n", hi);
 		awaitResponse(sockinfo);
 	}
 	return;
@@ -56,8 +56,8 @@ void awaitResponse( int sockinfo) {
 	int returned = recv(sockinfo, msg, 1500, 0);
 	if(returned > 0){
 		char cid = *msg;
-		uint tid = *(msg + 1);
-		short dataLength = *(msg + 5);
+		uint tid = *(uint*)(msg + 1);
+		short dataLength = *(short*)(msg + 5);
 		char* dataStart = msg + 7;
 
 		//printf("%02X, %u \n", cid, tid);
@@ -65,7 +65,8 @@ void awaitResponse( int sockinfo) {
 		printf("cid:		%02X\n", cid);
 		printf("tid:		%u\n", tid);
 		printf("dataLength:	%hd\n", dataLength);
-		printf("dataStart:	%s\n", dataStart);
+		fwrite(dataStart, dataLength, 1, stdout);
+		printf("\n");
 	}
 	free(msg);
 	return;
@@ -123,10 +124,10 @@ void natCommand( char** cmdArgs) {
 			}
 			break;
 		case 1:			// remove, expected args count = 10
-			if (countArgs(cmdArgs) == 11) sendMessage(0x13, cmdArgs);
+			if (countArgs(cmdArgs) == 10) sendMessage(0x13, cmdArgs);
 			else {
 				printf("Format error. Try using: nat remove [HOSTNAME] ");
-				printf("[CHAIN] [POSITION] -d [DEST IP] -j DNAT --to-destination [NEW DEST IP]\n");
+				printf("[CHAIN] -d [DEST IP] -j DNAT --to-destination [NEW DEST IP]\n");
 			}
 			break;
 		case 2:			// show, expected args count = 3

@@ -13,16 +13,11 @@ void receiveCommand(char* messagePtr, int socket) {
 	short dataLength = *(short*)(messagePtr + 5);
 	char* dataStart = messagePtr + 7;
 
-	//printf("%02X, %u \n", cid, tid);
-
 	printf("cid:		%02X\n", cid);
 	printf("tid:		%u\n", tid);
 	printf("dataLength:	%hd\n", dataLength);
 	printf("dataStart:	%s\n", dataStart);
 	int i;
-	for(i=0; i<7; i++){
-		printf("%02X \n", messagePtr[i]);
-	}
 
 	int status;
 
@@ -64,7 +59,6 @@ void receiveCommand(char* messagePtr, int socket) {
 		default:
 			break;
 	}
-
 	if(status == 3) {
 		sendShow(cid, tid, socket);
 	} else if (status) {
@@ -110,26 +104,23 @@ int executeShow(char* args[]) {
 	FILE* soFile;
 	soFile = fopen("hostSTDOUT.txt", "w");
 	int status;
-        pid_t   childpid;
+	pid_t   childpid;
 
-        if((childpid = fork()) == -1)
-        {
-                perror("fork");
-                exit(1);
-        }
-        if(childpid == 0)
-        {
-		dup2(fileno(soFile), STDOUT_FILENO);
-		if (execvp(args[0], args) < 0) {
-			printf("*** ERROR: exec failed\n");
-			exit(1);
-		}
-                exit(0);
-        }
-        else
-        {
+	if((childpid = fork()) == -1) {
+		perror("fork");
+		exit(1);
+	}
+	if(childpid == 0) {
+			dup2(fileno(soFile), STDOUT_FILENO);
+			fclose(soFile);
+			if (execvp(args[0], args) < 0) {
+				printf("*** ERROR: exec failed\n");
+				exit(1);
+			}
+			exit(0);
+	} else {
 		while (wait(&status) != childpid);			/* wait for completion		*/
-        }
+	}
 	return !status; // convert to true/false value
 }
 
@@ -157,14 +148,13 @@ void sendSuccess(char cid, uint tid, int socket) {
 
 	*(messagePtr + 7 + dataLength) = '\0';
 
-	fwrite(messagePtr, msgLoc, 1, stdout);
-	printf("\n %hd \n", *(messagePtr + 5));
-
 	if(send(socket, messagePtr, 7+dataLength, 0) == -1){
 		printf("Send error \n");
 		close(socket);
+		free(messagePtr);
 		return;
 	}
+	free(messagePtr);
 	return;
 }
 
@@ -177,11 +167,11 @@ void sendShow(char cid, uint tid, int socket) {
 	int msgLoc = 0;
 	char space = ' ';
 
-	char output[20][128];
+	char output[50][128];
 	int i = 0;
 
 	while(fgets(output[i], 128, soFile) != NULL) { //As long as there are still arguments
-		dataLength += (short)strlen(output[i]) + 1;
+		dataLength += (short) strlen(output[i]) + 1;
 		//printf("current dataLength: %hd of output: %s", dataLength, output[i]);
 		i++;
 	}
@@ -195,24 +185,25 @@ void sendShow(char cid, uint tid, int socket) {
 	memcpy(messagePtr + msgLoc, &dataLength, sizeof(short));
 	msgLoc += 2;
 
-	i=0;
-	while(i<15){
-		memcpy(messagePtr + msgLoc, output[i], strlen(output[i]));
+	int j=0;
+	while( j < i){
+		printf("%s", output[j]);
+		memcpy(messagePtr + msgLoc, output[j], strlen(output[j]));
 		memcpy(messagePtr + msgLoc + strlen(output[i]), &space, sizeof(char));
-		msgLoc += strlen(output[i]) + 1;
-		i++;
+		msgLoc += strlen(output[j]) + 1;
+		j++;
 	}
 	*(messagePtr + 7 + dataLength) = '\0';
-	printf("\n\n");
-
-	fwrite(messagePtr, msgLoc, 1, stdout);
-	printf("\n %hd \n", *(messagePtr + 5));
 
 	if(send(socket, messagePtr, 7+dataLength, 0) == -1){
 		printf("Send error \n");
 		close(socket);
+		fclose(soFile);
+		free(messagePtr);
 		return;
 	}
+	fclose(soFile);
+	free(messagePtr);
 	return;
 }
 
@@ -224,11 +215,12 @@ void sendFailure(char cid, uint tid, int socket) {
 	int msgLoc = 0;
 	char space = ' ';
 
-	char output[128];
+	char output[50][128];
 	int i = 0;
 
-	while(fgets(output, 128, seFile) != NULL) { //As long as there are still arguments
-		dataLength += strlen(output) + 1;
+	while(fgets(output[i], 128, seFile) != NULL) { //As long as there are still arguments
+		dataLength += strlen(output[i]) + 1;
+		i++;
 	}
 	fclose(seFile);
 	char* messagePtr = malloc(sizeof(char) * (HEADER + dataLength));
@@ -239,18 +231,23 @@ void sendFailure(char cid, uint tid, int socket) {
 	memcpy(messagePtr + msgLoc, &dataLength, sizeof(short));
 	msgLoc += 2;
 
-	memcpy(messagePtr + msgLoc, output, strlen(output));
-	memcpy(messagePtr + msgLoc + strlen(output), &space, sizeof(char));
-	msgLoc += strlen(output) + 1;
-	*(messagePtr + 7 + dataLength) = '\0';
-	printf("\n\n");
+	int j=0;
+	while( j < i){
+		printf("%s", output[j]);
+		memcpy(messagePtr + msgLoc, output[j], strlen(output[j]));
+		memcpy(messagePtr + msgLoc + strlen(output[i]), &space, sizeof(char));
+		msgLoc += strlen(output[j]) + 1;
+		j++;
+	}
+	printf("\n");
 
-	fwrite(messagePtr, msgLoc, 1, stdout);
 	if(send(socket, messagePtr, 7+dataLength, 0) == -1){
 		printf("Send error \n");
 		close(socket);
+		free(messagePtr);
 		return;
 	}
+	free(messagePtr);
 	return;
 }
 
@@ -264,8 +261,6 @@ int addIPv6Alias(char cid, uint tid, short dataLength, char* dataStart) {
 		cmdtok[tokcnt] = strtok( NULL, delimiter);
 		tokcnt++;
 	}
-
-	printf("cmdtok: %s, %s, %s\n", cmdtok[0], cmdtok[4], cmdtok[3]);
 
 	char* args[32] = {"ifconfig", cmdtok[4], "inet6", "add", cmdtok[3], '\0' };
 
@@ -285,8 +280,6 @@ int removeIPv6Alias(char cid, uint tid, short dataLength, char* dataStart) {
 		cmdtok[tokcnt] = strtok( NULL, delimiter);
 		tokcnt++;
 	}
-
-	printf("cmdtok: %s, %s, %s\n", cmdtok[0], cmdtok[4], cmdtok[3]);
 	
 	if(cmdtok[4] != NULL && cmdtok[3] != NULL) {
 
@@ -319,16 +312,9 @@ int addNatRule(char cid, uint tid, short dataLength, char* dataStart) {
 		tokcnt++;
 	}
 
-	printf("cmdtok: %s, %s, %s\n", cmdtok[0], cmdtok[4], cmdtok[3]);
-
 	char* args[32] = {"ip6tables", "-t", "nat", "-I", cmdtok[3], cmdtok[4], "-p", "tcp",
 		cmdtok[5], cmdtok[6], cmdtok[7], cmdtok[8], cmdtok[9], cmdtok[10], '\0' };
 	int i = 0;
-	while(args[i]){
-		printf("%s ", args[i]);
-		i++;
-	}
-	printf("\n");
 
 	int success = executeArgs(args);
 
@@ -346,16 +332,9 @@ int removeNatRule(char cid, uint tid, short dataLength, char* dataStart) {
 		tokcnt++;
 	}
 
-	printf("cmdtok: %s, %s, %s\n", cmdtok[0], cmdtok[4], cmdtok[3]);
-
 	char* args[32] = {"ip6tables", "-t", "nat", "-D", cmdtok[3], "-p", "tcp",
 		cmdtok[4], cmdtok[5], cmdtok[6], cmdtok[7], cmdtok[8], cmdtok[9], '\0' };
 	int i = 0;
-	while(args[i]){
-		printf("%s ", args[i]);
-		i++;
-	}
-	printf("\n");
 
 	int success = executeArgs(args);
 

@@ -41,7 +41,6 @@ struct hostInfo* loadDatabase(){
 			memcpy(host->hostName, hostName, 32);
 			memcpy(host->secret, secret, 16);
 			host->socket = 0;
-			printf("name: %s,\n secret: %s,\n end: %d\n", host->hostName, host->secret, end); 
 		}
 		else{
 			prevHost->next = NULL;
@@ -64,7 +63,6 @@ void listenForHosts(){
 		return;
 	}
 	listenSocket = socket(res->ai_family, res->ai_socktype, res->ai_protocol);
-	printf("open socket %d \n", listenSocket);
 	if(listenSocket == -1){
 		printf("Socket error \n");
 		return;
@@ -96,23 +94,20 @@ void listenForHosts(){
 		// 	}
 		// 	currentHost = currentHost->next;
 		// }
-		printf("selecting \n");
 		select(numfds+1, &inputs, NULL, NULL, NULL);
-		printf("finish selecting \n");
 		if(FD_ISSET(0, &inputs)){
-			printf("%c", getc(stdin));
-			printf("butts \n");
+			char cmdline[514];
+			fgets( cmdline, 512, stdin);
+			parseCommandLine(cmdline);
+			printf(">> ");
 		}
 		if(FD_ISSET(listenSocket, &inputs)){
-			printf("listenSocket file descriptor \n");
 			listen(listenSocket, 5);
 			addrSize = sizeof(hostAddr);
 			commSocket = accept(listenSocket, (struct sockaddr *)&hostAddr, &addrSize);
-			printf("open commsocket %d \n", commSocket);
 			char* msg = malloc(1500*sizeof(char));
 			int returned = recv(commSocket, msg, 1500, 0);
 			if(returned > 0){
-				printf("Message Received, cid %02X \n", *msg);
 				char cid = *msg;
 				uint tid = *(msg+1);
 				short dataLength = *(msg+5);
@@ -121,9 +116,7 @@ void listenForHosts(){
 					char secret[16];
 					memset(secret, 0, 16);
 					sscanf(msg+7, "%s %s", hostName, secret);
-					printf("secret: %s \n", secret);
 					struct hostInfo* currentHost = firstHost;
-					printf("Hostname : %s \n Secret : %s \n", hostName, secret);
 					int hostFound = 0;
 					while(currentHost != NULL){
 						if(!strcmp(hostName, currentHost->hostName)){
@@ -131,12 +124,10 @@ void listenForHosts(){
 								currentHost->socket = commSocket;
 								hostFound = 1;
 								printf("Host %s connected! \n", hostName);
-								printf("storing commsocket %d \n", commSocket);
 							}
 							else{
 							//Invalid secret
 							}
-							printf("Breaking");
 							break;
 						}
 						currentHost = currentHost->next;
@@ -146,31 +137,26 @@ void listenForHosts(){
 						currentHost = firstHost;
 						while(currentHost != NULL){
 							if(currentHost->socket == 0){
-								printf("Host not connected yet: %s \n", currentHost->hostName);
 								waitHosts = 1;
 								printf(">> ");
 								break;
 							}
-							printf("Iterating past %s to %s \n", currentHost->hostName, currentHost->next->hostName);
 							currentHost = currentHost->next;
 						}
 					}
 					else{
-						printf("early terminating commsocket %d \n", commSocket);
 						close(commSocket);
 					}
 				}
 				else{
-					printf("early terminating commsocket %d \n", commSocket);
 					close(commSocket);
 				}
 			}
 			free(msg);
-			printf("Loop end \n");
+			printf(">> ");
 		}
-
 	}
-	printf("closing listen socket cause no more hosts %d \n", listenSocket);
+	printf("All hosts connected! \n", listenSocket);
 	close(listenSocket);
 	return;
 }
@@ -208,10 +194,10 @@ void parseCommandLine(char* cmdline){
 			else if( !strcmp( cmdtok[0], exitstr)){
 				struct hostInfo* currentHost = firstHost;
 				while(currentHost != NULL){
-					printf("close commsocket %d \n", currentHost->socket);
 					close(currentHost->socket);
 					currentHost = currentHost->next;
 				}
+				free(firstHost);
 				exit(0);
 			}
 			else{
@@ -232,7 +218,7 @@ void parseCommandLine(char* cmdline){
 }
 
 void executeUserCommand( char* cmdArgs[32]) {
-	if( !cmdArgs[0]){
+	if( !cmdArgs[1]){
 		printf( "no second command\n");					// error: no second command
 	} else {
 		int indexOfCommand = getCommandIndex( cmdArgs[0]);

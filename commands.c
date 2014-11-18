@@ -34,20 +34,21 @@ void sendMessage(char cid, char** cmdArgs){
 	// for(i=0; i<msgLoc; i++){
 	// 	printf("%02X \n", messagePtr[i]);
 	// }
-	printf("send to host: %s\n", cmdArgs[2]);
 	//receiveCommand(messagePtr); // instead send the message through to host
 	int sockinfo = getSocketByName(cmdArgs[1]); 
 	if(sockinfo < 0){
 		sockinfo = getSocketByName(cmdArgs[2]);
 	}
-	
-	if(send(sockinfo, messagePtr, 7+dataLength, 0) == -1){
-		printf("Send error \n");
-		close(sockinfo);
-	} else {
-		printf("successfully sent\n");
-		awaitResponse(sockinfo);
+	if(sockinfo > 0){
+		if(send(sockinfo, messagePtr, 7+dataLength, 0) == -1){
+			printf("Send error \n");
+			close(sockinfo);
+		} else {
+			printf("successfully sent\n");
+			awaitResponse(sockinfo);
+		}
 	}
+	free(messagePtr);
 	return;
 }
 
@@ -59,8 +60,6 @@ void awaitResponse( int sockinfo) {
 		uint tid = *(uint*)(msg + 1);
 		short dataLength = *(short*)(msg + 5);
 		char* dataStart = msg + 7;
-
-		//printf("%02X, %u \n", cid, tid);
 
 		printf("cid:		%02X\n", cid);
 		printf("tid:		%u\n", tid);

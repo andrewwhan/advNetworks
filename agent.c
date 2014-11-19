@@ -33,7 +33,6 @@ int controllerConnect(){
 	struct sockaddr_in* theiraddress = (struct sockaddr_in*)res->ai_addr;
 	int i = 0;
 	for(i = 0; i < 4; i++){
-	printf("%hhd \n", *((char*)&(theiraddress->sin_addr.s_addr) + i));
 	}
 	if(connect(sockinfo, res->ai_addr, res->ai_addrlen) == -1){
 		printf("Connection error \n");
@@ -51,7 +50,6 @@ int controllerConnect(){
 	*(msg + 1) = tid;
 
 	fscanf(dbFile, "%s %s", hostName, secret);
-	printf("Sending %s, %s \n", hostName, secret);
 	snprintf(msg + 7, sizeof(msg)-7, "%s %s", hostName, secret);
 	*(msg + 8 + strlen(hostName) + strlen(secret)) = '\0';
 	if(send(sockinfo, msg, 9 + strlen(hostName) + strlen(secret), 0) == -1){
@@ -71,9 +69,6 @@ void waitForCommands(int socket) {
 		if (returned > 0) {
 			printf("command recieved");
 			receiveCommand(msg, socket);
-		}
-		else{
-			printf("recv error");
 		}
 	}
 	return;

@@ -156,7 +156,7 @@ void listenForHosts(){
 			printf(">> ");
 		}
 	}
-	printf("All hosts connected! \n", listenSocket);
+	printf("All hosts connected! \n");
 	close(listenSocket);
 	return;
 }

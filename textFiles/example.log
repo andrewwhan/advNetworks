@@ -1,0 +1,96 @@
+root@andrew-VirtualBox:/media/sf_cs4516# ./controller
+Socket set up 
+Host host1.team3.4516.cs.wpi.edu connected! 
+>> Host host2.team3.4516.cs.wpi.edu connected! 
+
+>> alias show host1.team3.4516.cs.wpi.edu
+>> successfully sent
+cid:		20
+tid:		1354
+dataLength:	1032
+eth0      Link encap:Ethernet  HWaddr 52:54:00:45:16:09  
+          inet addr:10.45.3.1  Bcast:10.255.255.255  Mask:255.0.0.0
+          inet6 addr: fe80::5054:ff:fe45:1609/64 Scope:Link
+          inet6 addr: 2607:f5c0:8010:c0de:4516:3:0:1/112 Scope:Global
+          inet6 addr: 15::1230/128 Scope:Global
+          UP BROADCAST RUNNING MULTICAST  MTU:1500  Metric:1
+          RX packets:505993 errors:0 dropped:0 overruns:0 frame:0
+          TX packets:177770 errors:0 dropped:0 overruns:0 carrier:0
+          collisions:0 txqueuelen:1000 
+          RX bytes:224281311 (224.2 MB)  TX bytes:17647595 (17.6 MB)
+
+lo        Link encap:Local Loopback  
+          inet addr:127.0.0.1  Mask:255.0.0.0
+          inet6 addr: ::1/128 Scope:Host
+          UP LOOPBACK RUNNING  MTU:65536  Metric:1
+          RX packets:101 errors:0 dropped:0 overruns:0 frame:0
+          TX packets:101 errors:0 dropped:0 overruns:0 carrier:0
+          collisions:0 txqueuelen:0 
+          RX bytes:11392 (11.3 KB)  TX bytes:11392 (11.3 KB)
+
+
+
+>> alias add host1.team3.4516.cs.wpi.edu 128::256/112 eth0:0
+>> successfully sent
+cid:		00
+tid:		1355
+dataLength:	40
+Success! specified command was executed 
+alias show host1.team3.4516.cs.wpi.edu
+>> successfully sent
+cid:		20
+tid:		1356
+dataLength:	1081
+eth0      Link encap:Ethernet  HWaddr 52:54:00:45:16:09  
+          inet addr:10.45.3.1  Bcast:10.255.255.255  Mask:255.0.0.0
+          inet6 addr: 128::256/112 Scope:Global
+          inet6 addr: fe80::5054:ff:fe45:1609/64 Scope:Link
+          inet6 addr: 2607:f5c0:8010:c0de:4516:3:0:1/112 Scope:Global
+          inet6 addr: 15::1230/128 Scope:Global
+          UP BROADCAST RUNNING MULTICAST  MTU:1500  Metric:1
+          RX packets:506554 errors:0 dropped:0 overruns:0 frame:0
+          TX packets:177811 errors:0 dropped:0 overruns:0 carrier:0
+          collisions:0 txqueuelen:1000 
+          RX bytes:224362885 (224.3 MB)  TX bytes:17654671 (17.6 MB)
+
+lo        Link encap:Local Loopback  
+          inet addr:127.0.0.1  Mask:255.0.0.0
+          inet6 addr: ::1/128 Scope:Host
+          UP LOOPBACK RUNNING  MTU:65536  Metric:1
+          RX packets:101 errors:0 dropped:0 overruns:0 frame:0
+          TX packets:101 errors:0 dropped:0 overruns:0 carrier:0
+          collisions:0 txqueuelen:0 
+          RX bytes:11392 (11.3 KB)  TX bytes:11392 (11.3 KB)
+
+
+
+>> alias remove host1.team3.4516.cs.wpi.edu 128::256/112 eth0:0
+>> successfully sent
+cid:		10
+tid:		1357
+dataLength:	40
+Success! specified command was executed 
+alias show host1.team3.4516.cs.wpi.edu            
+>> successfully sent
+cid:		20
+tid:		1358
+dataLength:	1032
+e h0      Link encap:Ethernet  HWaddr 52:54:00:45:16:09  
+          inet addr:10.45.3.1  Bcast:10.255.255.255  Mask:255.0.0.0
+          inet6 addr: fe80::5054:ff:fe45:1609/64 Scope:Link
+          inet6 addr: 2607:f5c0:8010:c0de:4516:3:0:1/112 Scope:Global
+          inet6 addr: 15::1230/128 Scope:Global
+          UP BROADCAST RUNNING MULTICAST  MTU:1500  Metric:1
+          RX packets:506990 errors:0 dropped:0 overruns:0 frame:0
+          TX packets:177839 errors:0 dropped:0 overruns:0 carrier:0
+          collisions:0 txqueuelen:1000 
+          RX bytes:224448353 (224.4 MB)  TX bytes:17660824 (17.6 MB)
+
+ l         Link encap:Local Loopback  
+          inet addr:127.0.0.1  Mask:255.0.0.0
+          inet6 addr: ::1/128 Scope:Host
+          UP LOOPBACK RUNNING  MTU:65536  Metric:1
+          RX packets:101 errors:0 dropped:0 overruns:0 frame:0
+          TX packets:101 errors:0 dropped:0 overruns:0 carrier:0
+          collisions:0 txqueuelen:0 
+          RX bytes:11392 (11.3 KB)  TX bytes:11392 (11.3 KB)

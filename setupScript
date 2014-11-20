@@ -2,16 +2,9 @@ for i in 1 2 3 4
 do
 echo "Compiling host $i"
 case $i in
-<<<<<<< Updated upstream
 1) ssh -t cs4516@10.45.3.$i 'sudo ifconfig eth0 inet6 add 2607:f5c0:8010:c0de:4516:3:0:1/112 ; sudo apt-get update ; sudo apt-get install make' ;;
 2) ssh -t cs4516@10.45.3.$i 'sudo ifconfig eth0 inet6 add 2607:f5c0:8010:c0de:4516:3:0:2/112 ; sudo apt-get update ; sudo apt-get install make' ;;
 3) ssh -t cs4516@10.45.3.$i 'sudo ifconfig eth0 inet6 add 2607:f5c0:8010:c0de:4516:3:0:3/112 ; sudo apt-get update ; sudo apt-get install make' ;;
 4) ssh -t cs4516@10.45.3.$i 'sudo ifconfig eth0 inet6 add 2607:f5c0:8010:c0de:4516:3:0:4/112 ; sudo apt-get update ; sudo apt-get install make' ;;
-=======
-1) ssh -t cs4516@10.45.3.$i 'cd sf_cs4516 ; sudo apt-get update ; sudo apt-get install make' ;;
-2) ssh -t cs4516@10.45.3.$i 'cd sf_cs4516 ; sudo apt-get update ; sudo apt-get install make' ;;
-3) ssh -t cs4516@10.45.3.$i 'cd sf_cs4516 ; sudo apt-get update ; sudo apt-get install make' ;;
-4) ssh -t cs4516@10.45.3.$i 'cd sf_cs4516 ; sudo apt-get update ; sudo apt-get install make' ;;
->>>>>>> Stashed changes
 esac
 done

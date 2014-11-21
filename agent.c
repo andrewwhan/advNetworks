@@ -18,7 +18,7 @@ int controllerConnect(){
 	int status, sockinfo;
 	struct addrinfo hints, *res;
 	memset(&hints, 0, sizeof(hints));
-	hints.ai_family = AF_INET;
+	hints.ai_family = AF_INET6;
 	hints.ai_socktype = SOCK_STREAM;
 	status = getaddrinfo(url, port, &hints, &res);
 	if(status != 0){

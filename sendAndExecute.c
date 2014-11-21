@@ -14,19 +14,19 @@ int executeArgs(char* args[]) {
 	pid_t  pid;
 	int    status;
 
-	if ((pid = fork()) < 0) {					/* fork a child process		*/
+	if ((pid = fork()) < 0) {					// fork a child process
 		printf("*** ERROR: forking child process failed\n");
 		exit(1);
-	} else if (pid == 0) {						/* for the child process:	*/
+	} else if (pid == 0) {						// for the child process:
 		dup2(fileno(seFile), STDERR_FILENO);
 		fclose(seFile);
-		if (execvp(args[0], args) < 0) {		/* execute the command		*/
+		if (execvp(args[0], args) < 0) {		// execute the command
 			printf("*** ERROR: exec failed\n");
 			exit(1);
 		}
 		exit(0);
-	} else {									/* for the parent:		*/
-		while (wait(&status) != pid);			/* wait for completion		*/
+	} else {									// for the parent:
+		while (wait(&status) != pid);			// wait for completion
 	}
 	return !status; // convert to true/false value
 }
@@ -68,7 +68,7 @@ char* constructHeader( char cid, uint tid, short dataLength) {
 	return messagePtr;
 }
 
-void sendMessage(int socket, char* messagePtr, short dataLength) {
+void sendMessageHost(int socket, char* messagePtr, short dataLength) {
 	if(send(socket, messagePtr, dataLength, 0) == -1){
 		printf("Send error \n");
 		close(socket);
@@ -106,8 +106,7 @@ void sendSuccess(char cid, uint tid, int socket) {
 	memcpy(messagePtr + msgLoc + strlen(successMessage), &space, sizeof(char));
 	msgLoc += strlen(successMessage) + 1;
 
-	sendMessage(socket, messagePtr, 7+dataLength);						// send message
-
+	//sendMessage(socket, messagePtr, 7+dataLength);						// send message
 	free(messagePtr);
 	return;
 }
@@ -133,7 +132,7 @@ void sendShow(char cid, uint tid, int socket) {
 	fillMessageData ( argCount, output, messagePtr);
 	*(messagePtr + 7 + dataLength) = '\0';
 
-	sendMessage(socket, messagePtr, 7+dataLength);				// send message
+	//sendMessage(socket, messagePtr, 7+dataLength);				// send message
 	free(messagePtr);
 	return;
 }
@@ -159,7 +158,7 @@ void sendFailure(char cid, uint tid, int socket) {
 	fillMessageData( argCount, output, messagePtr);
 	*(messagePtr + 7 + dataLength) = '\0';
 
-	sendMessage(socket, messagePtr, 7+dataLength);				// send message
+	//sendMessage(socket, messagePtr, 7+dataLength);				// send message
 	free(messagePtr);
 	return;
 }

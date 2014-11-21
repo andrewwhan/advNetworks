@@ -31,8 +31,8 @@ void sendMessage(char cid, char** cmdArgs){
 		msgLoc += strlen(cmdArgs[i]) + 1;
 		i++;
 	}
-	//receiveCommand(messagePtr); // instead send the message through to host
-	int sockinfo = getSocketByName(cmdArgs[1]);  					// get host's socket informatoin
+	receiveCommand(messagePtr); // instead send the message through to host
+	/*int sockinfo = getSocketByName(cmdArgs[1]);  					// get host's socket informatoin
 	if(sockinfo < 0){
 		sockinfo = getSocketByName(cmdArgs[2]);
 	}
@@ -44,7 +44,7 @@ void sendMessage(char cid, char** cmdArgs){
 			printf("successfully sent\n");
 			awaitResponse(sockinfo);
 		}
-	}
+	}*/
 	free(messagePtr);
 	return;
 }

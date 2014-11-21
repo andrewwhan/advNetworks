@@ -14,7 +14,7 @@ struct hostInfo{
 
 int main( int argc, char* argv[]){
 	firstHost = loadDatabase();			//Read database file for host information
-	listenForHosts();					// listen to establish connections to hosts
+	// listenForHosts();					// listen to establish connections to hosts
 	controllerCommandTerminal();		// start command line for user input
 }
 

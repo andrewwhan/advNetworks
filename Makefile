@@ -1,7 +1,7 @@
 all: controller agent
 
-controller: controller.c controller.h commands
-	gcc controller.c commands.o -o controller
+controller: controller.c controller.h commands hostCommands
+	gcc controller.c commands.o hostCommands.o sendAndExecute.o -o controller
 
 commands: commands.c commands.h
 	gcc -c commands.c

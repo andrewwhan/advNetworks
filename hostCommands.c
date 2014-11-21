@@ -56,6 +56,9 @@ void receiveCommand(char* messagePtr, int socket) {
 				status = 3; // indicate that it is a show command that executed correctly
 			}
 			break;
+		case 0x0A:
+			// Exit command
+			cleanExit(socket, messagePtr);
 		default:
 			break;
 	}
@@ -348,4 +351,10 @@ int showNatRule(char cid, uint tid, short dataLength, char* dataStart) {
 	int success = executeShow(args);
 
 	return success;
+}
+
+void cleanExit(int socket, char* messagePtr){
+	close(socket);
+	free(messagePtr);
+	exit(0);
 }

@@ -7,6 +7,7 @@ int showIPv6Alias(char cid, uint tid, short dataLength, char* dataStart);
 int addNatRule(char cid, uint tid, short dataLength, char* dataStart);
 int removeNatRule(char cid, uint tid, short dataLength, char* dataStart);
 int showNatRule(char cid, uint tid, short dataLength, char* dataStart);
+void cleanExit(int socket, char* messagePtr);
 void sendFailure(char cid, uint tid, int socket);
 void sendSuccess(char cid, uint tid, int socket);
 void sendShow(char cid, uint tid, int socket);

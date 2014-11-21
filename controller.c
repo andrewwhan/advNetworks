@@ -152,9 +152,7 @@ void listenForHosts(){
 					close(commSocket);
 				}
 			}
-			free(msg);
-			printf(">> ");
-		}
+			free(msg);		}
 	}
 	printf("All hosts connected! \n");
 	close(listenSocket);
@@ -194,10 +192,24 @@ void parseCommandLine(char* cmdline){
 			else if( !strcmp( cmdtok[0], exitstr)){
 				struct hostInfo* currentHost = firstHost;
 				while(currentHost != NULL){
-					close(currentHost->socket);
+					if(currentHost->socket != 0){
+						char* exitArgs[2];
+						exitArgs[0] = malloc(sizeof(char)*5);
+						strcpy(exitArgs[0], "exit");
+						exitArgs[1] = currentHost->hostName;
+						strncpy(exitArgs[1], currentHost->hostName, 32);
+						executeUserCommand(exitArgs);
+						free(exitArgs[0]);
+					}
+					// close(currentHost->socket);
 					currentHost = currentHost->next;
 				}
-				free(firstHost);
+				currentHost = firstHost;
+				while(currentHost != NULL){
+					currentHost = currentHost->next;
+					free(firstHost);
+					firstHost = currentHost;
+				}
 				exit(0);
 			}
 			else{
@@ -235,6 +247,9 @@ void executeUserCommand( char* cmdArgs[32]) {
 			//printf( "nat command\n");
 			natCommand( cmdArgs);
 			break;
+			case 3:
+				exitCommand(cmdArgs);
+				break;
 			case -1:									// error: command name not recognized
 			printf( "not valid command\n");
 			break;
@@ -244,9 +259,9 @@ void executeUserCommand( char* cmdArgs[32]) {
 }
 
 int getCommandIndex( char* cmdName) {
-	const char* cmdNames[] = { "alias", "request", "nat"};			// check command names
+	const char* cmdNames[] = { "alias", "request", "nat", "exit"};			// check command names
 	int i;
-	for( i = 0; i < 3; i++) {
+	for( i = 0; i < 4; i++) {
 		if( !strcmp( cmdName, cmdNames[i])) {
 			return i;
 		}

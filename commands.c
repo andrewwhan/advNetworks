@@ -44,7 +44,7 @@ void sendMessage(char cid, char** cmdArgs){
 			printf("Send error \n");
 			close(sockinfo);
 		} else {
-			printf("successfully sent\n");
+			printf("Successfully sent\n");
 			awaitResponse(sockinfo);
 		}
 	}
@@ -138,6 +138,10 @@ void natCommand( char** cmdArgs) {
 			return;
 	}
 	return;
+}
+
+void exitCommand( char** cmdArgs) {
+	sendMessage(0x0A, cmdArgs);
 }
 
 int getCommandIndexASR( char* cmdName) {

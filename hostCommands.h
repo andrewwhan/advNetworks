@@ -1,12 +1,7 @@
 void receiveCommand(char* messagePtr, int socket);
-int executeArgs(char* args[]);
-int executeShow(char* args[]);
 int addIPv6Alias(char cid, uint tid, short dataLength, char* dataStart);
 int removeIPv6Alias(char cid, uint tid, short dataLength, char* dataStart);
 int showIPv6Alias(char cid, uint tid, short dataLength, char* dataStart);
 int addNatRule(char cid, uint tid, short dataLength, char* dataStart);
 int removeNatRule(char cid, uint tid, short dataLength, char* dataStart);
 int showNatRule(char cid, uint tid, short dataLength, char* dataStart);
-void sendFailure(char cid, uint tid, int socket);
-void sendSuccess(char cid, uint tid, int socket);
-void sendShow(char cid, uint tid, int socket);

@@ -3,8 +3,8 @@
 
 int main(){
 	int socket;
-	if((socket = controllerConnect()) != -1){
-		waitForCommands(socket);
+	if((socket = controllerConnect()) != -1){		// establish connection with controller
+		waitForCommands(socket);					// wait for commands from controller
 	}
 	return;
 }
@@ -20,27 +20,23 @@ int controllerConnect(){
 	memset(&hints, 0, sizeof(hints));
 	hints.ai_family = AF_INET;
 	hints.ai_socktype = SOCK_STREAM;
-	status = getaddrinfo(url, port, &hints, &res);
+	status = getaddrinfo(url, port, &hints, &res);							// get address info of host in res
 	if(status != 0){
 		printf("getaddrinfo error: %s\n", gai_strerror(status));
 		return -1;
 	}
-	sockinfo = socket(res->ai_family, res->ai_socktype, res->ai_protocol);
+	sockinfo = socket(res->ai_family, res->ai_socktype, res->ai_protocol);	// establish host socket to communicate
 	if(sockinfo == -1){
 		printf("Socket error \n");
 		return -1;
 	}
-	struct sockaddr_in* theiraddress = (struct sockaddr_in*)res->ai_addr;
-	int i = 0;
-	for(i = 0; i < 4; i++){
-	}
-	if(connect(sockinfo, res->ai_addr, res->ai_addrlen) == -1){
+	if(connect(sockinfo, res->ai_addr, res->ai_addrlen) == -1){				// connect to controller socket
 		printf("Connection error \n");
 		close(sockinfo);
 		return -1;
 	}
 
-	FILE* dbFile;
+	FILE* dbFile;															// construct first message
 	dbFile = fopen("credentials.txt", "r");
 
 	char msg[55];
@@ -49,10 +45,10 @@ int controllerConnect(){
 	*msg = cid;
 	*(msg + 1) = tid;
 
-	fscanf(dbFile, "%s %s", hostName, secret);
+	fscanf(dbFile, "%s %s", hostName, secret);								// read secret from file
 	snprintf(msg + 7, sizeof(msg)-7, "%s %s", hostName, secret);
 	*(msg + 8 + strlen(hostName) + strlen(secret)) = '\0';
-	if(send(sockinfo, msg, 9 + strlen(hostName) + strlen(secret), 0) == -1){
+	if(send(sockinfo, msg, 9 + strlen(hostName) + strlen(secret), 0) == -1){	// send first message
 		printf("Send error \n");
 		close(sockinfo);
 		return -1;
@@ -62,10 +58,11 @@ int controllerConnect(){
 }
 
 void waitForCommands(int socket) {
+	printf("awaiting response\n");
 	int returned = 1;
 	while (returned > 0) {
 		char* msg = malloc(1500*sizeof(char));
-		returned = recv(socket, msg, 1500, 0);
+		returned = recv(socket, msg, 1500, 0);	// hang on waiting for response
 		if (returned > 0) {
 			printf("command recieved");
 			receiveCommand(msg, socket);

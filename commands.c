@@ -16,7 +16,7 @@ void sendMessage(char cid, char** cmdArgs){
 		dataLength += strlen(cmdArgs[i]) + 1;
 		i++;
 	}
-	char* messagePtr = malloc(sizeof(char) * (HEADER + dataLength));
+	char* messagePtr = malloc(sizeof(char) * (HEADER + dataLength)); // construct message header
 	memcpy(messagePtr + msgLoc, &cid, 1);
 	msgLoc++;
 	nextTid++;
@@ -25,21 +25,18 @@ void sendMessage(char cid, char** cmdArgs){
 	memcpy(messagePtr + msgLoc, &dataLength, sizeof(short));
 	msgLoc += 2;
 	i=0;
-	while(cmdArgs[i]){
+	while(cmdArgs[i]){ 												// construct message body
 		memcpy(messagePtr + msgLoc, cmdArgs[i], strlen(cmdArgs[i]));
 		memcpy(messagePtr + msgLoc + strlen(cmdArgs[i]), &space, sizeof(char));
 		msgLoc += strlen(cmdArgs[i]) + 1;
 		i++;
 	}
-	// for(i=0; i<msgLoc; i++){
-	// 	printf("%02X \n", messagePtr[i]);
-	// }
 	//receiveCommand(messagePtr); // instead send the message through to host
-	int sockinfo = getSocketByName(cmdArgs[1]); 
+	int sockinfo = getSocketByName(cmdArgs[1]);  					// get host's socket informatoin
 	if(sockinfo < 0){
 		sockinfo = getSocketByName(cmdArgs[2]);
 	}
-	if(sockinfo > 0){
+	if(sockinfo > 0){												// send message along socket
 		if(send(sockinfo, messagePtr, 7+dataLength, 0) == -1){
 			printf("Send error \n");
 			close(sockinfo);
@@ -54,14 +51,14 @@ void sendMessage(char cid, char** cmdArgs){
 
 void awaitResponse( int sockinfo) {
 	char* msg = malloc(1500*sizeof(char));
-	int returned = recv(sockinfo, msg, 1500, 0);
+	int returned = recv(sockinfo, msg, 1500, 0);		// hang on waiting for message
 	if(returned > 0){
-		char cid = *msg;
+		char cid = *msg;								// parse header and body
 		uint tid = *(uint*)(msg + 1);
 		short dataLength = *(short*)(msg + 5);
 		char* dataStart = msg + 7;
 
-		printf("cid:		%02X\n", cid);
+		printf("cid:		%02X\n", cid);				// show information
 		printf("tid:		%u\n", tid);
 		printf("dataLength:	%hd\n", dataLength);
 		fwrite(dataStart, dataLength, 1, stdout);
@@ -96,13 +93,13 @@ void aliasCommand( char** cmdArgs) {
 void responseCommand( char** cmdArgs) {
 	int commandIndex = getCommandIndexASR( cmdArgs[0]);
 	switch (commandIndex) {
-		case 0:			// add
+		case 0:									// add
 			sendMessage(0x02, cmdArgs);
 			break;
-		case 1:			// remove
+		case 1:									// remove
 			sendMessage(0x12, cmdArgs);
 			break;
-		case 2:			// show
+		case 2:									// show
 			sendMessage(0x22, cmdArgs);
 			break;
 		case -1:
@@ -131,7 +128,7 @@ void natCommand( char** cmdArgs) {
 			break;
 		case 2:			// show, expected args count = 3
 			if (countArgs(cmdArgs) == 3) sendMessage(0x23, cmdArgs);
-			else printf("Incorrect format. Use: nat show [HOSTNAME]\n");
+			else printf("Incorrect format. Try using: nat show [HOSTNAME]\n");
 			break;
 		case -1:
 			printf("Invalid nat command. Try using: add, show, remove\n");

@@ -106,7 +106,7 @@ void sendSuccess(char cid, uint tid, int socket) {
 	memcpy(messagePtr + msgLoc + strlen(successMessage), &space, sizeof(char));
 	msgLoc += strlen(successMessage) + 1;
 
-	//sendMessage(socket, messagePtr, 7+dataLength);						// send message
+	//sendMessage(socket, messagePtr, 7+dataLength);						// message send
 	free(messagePtr);
 	return;
 }

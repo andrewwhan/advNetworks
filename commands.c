@@ -91,22 +91,7 @@ void aliasCommand( char** cmdArgs) {
 }
 
 void responseCommand( char** cmdArgs) {
-	int commandIndex = getCommandIndexASR( cmdArgs[0]);
-	switch (commandIndex) {
-		case 0:									// add
-			sendMessage(0x02, cmdArgs);
-			break;
-		case 1:									// remove
-			sendMessage(0x12, cmdArgs);
-			break;
-		case 2:									// show
-			sendMessage(0x22, cmdArgs);
-			break;
-		case -1:
-			printf("invalid command: add, show, remove\n");
-			return;
-	}
-	return;
+
 }
 
 void natCommand( char** cmdArgs) {
@@ -132,6 +117,28 @@ void natCommand( char** cmdArgs) {
 			break;
 		case -1:
 			printf("Invalid nat command. Try using: add, show, remove\n");
+			return;
+	}
+	return;
+}
+
+void routeCommand( char** cmdArgs) {
+	int commandIndex = getCommandIndexASR( cmdArgs[1]);
+	switch (commandIndex) {
+		case 0:			// add 0x0, expected args count = 5
+			if (countArgs(cmdArgs) == 5) sendMessage(0x01, cmdArgs);
+			else printf("Format error. Try using: route add [HOSTNAME] [IP ADDRESS] [INTERFACE]\n");
+			break;
+		case 1:			// remove 0x1, expected args count = 5
+			if (countArgs(cmdArgs) == 5) sendMessage(0x11, cmdArgs);
+			else printf("Format error. Try using: route remove [HOSTNAME] [IP ADDRESS] [INTERFACE]\n");
+			break;
+		case 2:			// show 0x2, expected args count = 3
+			if(countArgs(cmdArgs) == 3) sendMessage(0x21, cmdArgs);
+			else printf("Format error. Try using: route show [HOSTNAME]\n");
+			break;
+		case -1:
+			printf("Invalid route command. Try using: add, show, remove\n");
 			return;
 	}
 	return;

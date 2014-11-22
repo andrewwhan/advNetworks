@@ -5,3 +5,6 @@ int showIPv6Alias(char cid, uint tid, short dataLength, char* dataStart);
 int addNatRule(char cid, uint tid, short dataLength, char* dataStart);
 int removeNatRule(char cid, uint tid, short dataLength, char* dataStart);
 int showNatRule(char cid, uint tid, short dataLength, char* dataStart);
+int addRoute(char cid, uint tid, short dataLength, char* dataStart);
+int removeRoute(char cid, uint tid, short dataLength, char* dataStart);
+int showRoute(char cid, uint tid, short dataLength, char* dataStart);

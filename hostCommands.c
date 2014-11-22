@@ -56,6 +56,21 @@ void receiveCommand(char* messagePtr, int socket) {
 				status = 3; // indicate that it is a show command that executed correctly
 			}
 			break;
+		case 0x01:
+			// Add route command
+			status = addRoute(cid, tid, dataLength, dataStart);
+			break;
+		case 0x11:
+			// Remove route command
+			status = removeRoute(cid, tid, dataLength, dataStart);
+			break;
+		case 0x21:
+			// Show route command
+			status = showRoute(cid, tid, dataLength, dataStart);
+			if( status) {
+				status = 3; // indicate that it is a show command that executed correctly
+			}
+			break;
 		default:
 			break;
 	}
@@ -110,12 +125,8 @@ int removeIPv6Alias(char cid, uint tid, short dataLength, char* dataStart) {
 		tokcnt++;
 	}
 	
-	if(cmdtok[4] != NULL && cmdtok[3] != NULL) {
-		char* args[32] = {"ifconfig", cmdtok[4], "inet6", "del", cmdtok[3], '\0' };
-		success = executeArgs(args);
-	} else {
-		success = 0;
-	}
+	char* args[32] = {"ifconfig", cmdtok[4], "inet6", "del", cmdtok[3], '\0' };
+	success = executeArgs(args);
 
 	return success;
 }
@@ -172,6 +183,43 @@ int removeNatRule(char cid, uint tid, short dataLength, char* dataStart) {
 int showNatRule(char cid, uint tid, short dataLength, char* dataStart) {
 
 	char* args[32] = { "ip6tables", "-t", "nat", "-L", '\0' };
+
+	int success = executeShow(args);
+
+	return success;
+}
+
+int addRoute(char cid, uint tid, short dataLength, char* dataStart) {
+	char** cmdtok = tokenizeData(dataStart);
+
+	char* args[32] = {"ip", "-6", "route", "add", cmdtok[3], "via", cmdtok[5], "dev", cmdtok[7], '\0'};
+
+	int success = executeArgs(args);
+
+	return success;
+}
+
+int removeRoute(char cid, uint tid, short dataLength, char* dataStart) {
+	char* cmdtok [32];
+	const char* delimiter = " \n";
+	int tokcnt = 1;
+	int success;
+
+	cmdtok[0] = strtok( dataStart, delimiter);			// tokenize command
+	while( cmdtok[tokcnt-1]){
+		cmdtok[tokcnt] = strtok( NULL, delimiter);
+		tokcnt++;
+	}
+
+	char* args[32] = {"ip", "-6", "route", "del", cmdtok[3], "via", cmdtok[5], "dev", cmdtok[7], '\0'};
+	success = executeArgs(args);
+
+	return success;
+}
+
+int showRoute(char cid, uint tid, short dataLength, char* dataStart) {
+
+	char* args[32] = { "route", "-A", "inet6", '\0' };
 
 	int success = executeShow(args);
 

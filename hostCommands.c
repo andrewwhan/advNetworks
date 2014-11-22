@@ -91,7 +91,7 @@ void function(char cid, uint tid, short dataLength, char* dataStart){
 */
 
 char** tokenizeData(char* dataStart){
-	char* cmdtok[32];
+	char** cmdtok = (char**) malloc(sizeof(char*)*32);
 	const char* delimiter = " \n";
 	int tokcnt = 1;
 
@@ -110,24 +110,17 @@ int addIPv6Alias(char cid, uint tid, short dataLength, char* dataStart) {
 
 	int success = executeArgs(args);
 
+	free(cmdtok);
 	return success;
 }
 
 int removeIPv6Alias(char cid, uint tid, short dataLength, char* dataStart) {
-	char* cmdtok [32];
-	const char* delimiter = " \n";
-	int tokcnt = 1;
-	int success;
+	char** cmdtok = tokenizeData(dataStart);
 
-	cmdtok[0] = strtok( dataStart, delimiter);			// tokenize command
-	while( cmdtok[tokcnt-1]){
-		cmdtok[tokcnt] = strtok( NULL, delimiter);
-		tokcnt++;
-	}
-	
 	char* args[32] = {"ifconfig", cmdtok[4], "inet6", "del", cmdtok[3], '\0' };
-	success = executeArgs(args);
+	int success = executeArgs(args);
 
+	free(cmdtok);
 	return success;
 }
 
@@ -141,42 +134,26 @@ int showIPv6Alias(char cid, uint tid, short dataLength, char* dataStart) {
 }
 
 int addNatRule(char cid, uint tid, short dataLength, char* dataStart) {
-	char* cmdtok [32];
-	const char* delimiter = " \n";
-	int tokcnt = 1;
-
-	cmdtok[0] = strtok( dataStart, delimiter);			// tokenize command
-	while( cmdtok[tokcnt-1]){
-		cmdtok[tokcnt] = strtok( NULL, delimiter);
-		tokcnt++;
-	}
+	char** cmdtok = tokenizeData(dataStart);
 
 	char* args[32] = {"ip6tables", "-t", "nat", "-I", cmdtok[3], cmdtok[4], "-p", "tcp",
 		cmdtok[5], cmdtok[6], cmdtok[7], cmdtok[8], cmdtok[9], cmdtok[10], '\0' };
-	int i = 0;
 
 	int success = executeArgs(args);
 
+	free(cmdtok);
 	return success;
 }
 
 int removeNatRule(char cid, uint tid, short dataLength, char* dataStart) {
-	char* cmdtok [32];
-	const char* delimiter = " \n";
-	int tokcnt = 1;
-
-	cmdtok[0] = strtok( dataStart, delimiter);			// tokenize command
-	while( cmdtok[tokcnt-1]){
-		cmdtok[tokcnt] = strtok( NULL, delimiter);
-		tokcnt++;
-	}
-
+	char** cmdtok = tokenizeData(dataStart);
+	
 	char* args[32] = {"ip6tables", "-t", "nat", "-D", cmdtok[3], "-p", "tcp",
 		cmdtok[4], cmdtok[5], cmdtok[6], cmdtok[7], cmdtok[8], cmdtok[9], '\0' };
-	int i = 0;
 
 	int success = executeArgs(args);
 
+	free(cmdtok);
 	return success;
 }
 
@@ -190,9 +167,23 @@ int showNatRule(char cid, uint tid, short dataLength, char* dataStart) {
 }
 
 int addRoute(char cid, uint tid, short dataLength, char* dataStart) {
-	char** cmdtok = tokenizeData(dataStart);
+	char* cmdtok [32];
+	const char* delimiter = " \n";
+	int tokcnt = 1;
 
-	char* args[32] = {"ip", "-6", "route", "add", cmdtok[3], "via", cmdtok[5], "dev", cmdtok[7], '\0'};
+	cmdtok[0] = strtok( dataStart, delimiter);			// tokenize command
+	while( cmdtok[tokcnt-1]){
+		cmdtok[tokcnt] = strtok( NULL, delimiter);
+		tokcnt++;
+	}
+
+	char* args[32] = {"ip", "-6", "route", "add"};
+	int i = 4;
+	while (i < tokcnt) {
+		args[i] = cmdtok[i-1];
+		i++;
+	}
+	args[i] == '\0';
 
 	int success = executeArgs(args);
 
@@ -211,9 +202,15 @@ int removeRoute(char cid, uint tid, short dataLength, char* dataStart) {
 		tokcnt++;
 	}
 
-	char* args[32] = {"ip", "-6", "route", "del", cmdtok[3], "via", cmdtok[5], "dev", cmdtok[7], '\0'};
+	char* args[32] = {"ip", "-6", "route", "del"};
+	int i = 4;
+	while (i < tokcnt) {
+		args[i] = cmdtok[i-1];
+		i++;
+	}
+	args[i] == '\0';
+	
 	success = executeArgs(args);
-
 	return success;
 }
 

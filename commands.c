@@ -126,11 +126,11 @@ void routeCommand( char** cmdArgs) {
 	int commandIndex = getCommandIndexASR( cmdArgs[1]);
 	switch (commandIndex) {
 		case 0:			// add 0x0, expected args count = 5
-			if (countArgs(cmdArgs) == 5) sendMessage(0x01, cmdArgs);
+			if (countArgs(cmdArgs) > 3) sendMessage(0x01, cmdArgs);
 			else printf("Format error. Try using: route add [HOSTNAME] [IP ADDRESS] [INTERFACE]\n");
 			break;
 		case 1:			// remove 0x1, expected args count = 5
-			if (countArgs(cmdArgs) == 5) sendMessage(0x11, cmdArgs);
+			if (countArgs(cmdArgs) > 3) sendMessage(0x11, cmdArgs);
 			else printf("Format error. Try using: route remove [HOSTNAME] [IP ADDRESS] [INTERFACE]\n");
 			break;
 		case 2:			// show 0x2, expected args count = 3

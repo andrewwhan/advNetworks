@@ -1,5 +1,6 @@
 #include "agent.h"
 #include "hostCommands.h"
+#include <errno.h>
 
 int main(){
 	int socket;
@@ -30,12 +31,8 @@ int controllerConnect(){
 		printf("Socket error \n");
 		return -1;
 	}
-	struct sockaddr_in* theiraddress = (struct sockaddr_in*)res->ai_addr;
-	int i = 0;
-	for(i = 0; i < 4; i++){
-	}
 	if(connect(sockinfo, res->ai_addr, res->ai_addrlen) == -1){
-		printf("Connection error \n");
+		printf("Connection error %s\n", strerror(errno));
 		close(sockinfo);
 		return -1;
 	}

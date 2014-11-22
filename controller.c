@@ -54,7 +54,7 @@ void listenForHosts(){
 	struct addrinfo hints, *res;
 	int listenSocket;
 	memset(&hints, 0, sizeof(hints));
-	hints.ai_family = AF_UNSPEC;
+	hints.ai_family = AF_INET6;
 	hints.ai_socktype = SOCK_STREAM;
 	hints.ai_flags = AI_PASSIVE;
 	int status = getaddrinfo(NULL, port, &hints, &res);
@@ -139,6 +139,7 @@ void listenForHosts(){
 							if(currentHost->socket == 0){
 								waitHosts = 1;
 								printf(">> ");
+								fflush(stdout);
 								break;
 							}
 							currentHost = currentHost->next;

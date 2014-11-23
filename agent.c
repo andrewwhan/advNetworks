@@ -1,5 +1,6 @@
 #include "agent.h"
 #include "hostCommands.h"
+#include <errno.h>
 
 int main(){
 	int socket;
@@ -18,7 +19,7 @@ int controllerConnect(){
 	int status, sockinfo;
 	struct addrinfo hints, *res;
 	memset(&hints, 0, sizeof(hints));
-	hints.ai_family = AF_INET;
+	hints.ai_family = AF_INET6;
 	hints.ai_socktype = SOCK_STREAM;
 	status = getaddrinfo(url, port, &hints, &res);							// get address info of host in res
 	if(status != 0){
@@ -30,8 +31,8 @@ int controllerConnect(){
 		printf("Socket error \n");
 		return -1;
 	}
-	if(connect(sockinfo, res->ai_addr, res->ai_addrlen) == -1){				// connect to controller socket
-		printf("Connection error \n");
+	if(connect(sockinfo, res->ai_addr, res->ai_addrlen) == -1){
+		printf("Connection error %s\n", strerror(errno));
 		close(sockinfo);
 		return -1;
 	}

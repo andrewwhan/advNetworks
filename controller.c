@@ -53,7 +53,7 @@ void listenForHosts(){
 	struct addrinfo hints, *res;
 	int listenSocket;
 	memset(&hints, 0, sizeof(hints));
-	hints.ai_family = AF_UNSPEC;
+	hints.ai_family = AF_INET6;
 	hints.ai_socktype = SOCK_STREAM;
 	hints.ai_flags = AI_PASSIVE;
 	int status = getaddrinfo(NULL, port, &hints, &res);
@@ -138,6 +138,7 @@ void listenForHosts(){
 							if(currentHost->socket == 0){
 								waitHosts = 1;
 								printf(">> ");
+								fflush(stdout);
 								break;
 							}
 							currentHost = currentHost->next;
@@ -151,9 +152,7 @@ void listenForHosts(){
 					close(commSocket);
 				}
 			}
-			free(msg);
-			printf(">> ");
-		}
+			free(msg);		}
 	}
 	printf("All hosts connected! \n");
 	close(listenSocket);
@@ -193,10 +192,24 @@ void parseCommandLine(char* cmdline){
 			else if( !strcmp( cmdtok[0], exitstr)){
 				struct hostInfo* currentHost = firstHost;
 				while(currentHost != NULL){
-					close(currentHost->socket);
+					if(currentHost->socket != 0){
+						char* exitArgs[2];
+						exitArgs[0] = malloc(sizeof(char)*5);
+						strcpy(exitArgs[0], "exit");
+						exitArgs[1] = currentHost->hostName;
+						strncpy(exitArgs[1], currentHost->hostName, 32);
+						executeUserCommand(exitArgs);
+						free(exitArgs[0]);
+					}
+					// close(currentHost->socket);
 					currentHost = currentHost->next;
 				}
-				free(firstHost);
+				currentHost = firstHost;
+				while(currentHost != NULL){
+					currentHost = currentHost->next;
+					free(firstHost);
+					firstHost = currentHost;
+				}
 				exit(0);
 			}
 			else{
@@ -231,12 +244,14 @@ void executeUserCommand( char* cmdArgs[32]) {
 			case 2:										// nat command
 				natCommand( cmdArgs);
 				break;
+			case 3:
+				exitCommand(cmdArgs);
+				break;
 			case 5:										// route command
 				routeCommand( cmdArgs);
 				break;
 			case 6:										// rule (firewall) command
 				ruleCommand( cmdArgs);
-				break;
 			case -1:									// error: command name not recognized
 				printf( "not valid command\n");
 				break;
@@ -246,6 +261,7 @@ void executeUserCommand( char* cmdArgs[32]) {
 }
 
 int getCommandIndex( char* cmdName) {
+<<<<<<< HEAD
 	const char* cmdNames[] = { "alias", "request", "nat", "exit", "file", "route", "rule" };			// check command names
 	int i;
 	for( i = 0; i < 7; i++) {

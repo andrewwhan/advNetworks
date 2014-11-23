@@ -14,3 +14,4 @@ void parseCommandLine();
 void executeUserCommand(char* cmdArgs[32]);
 int getCommandIndex(char* cmdName);
 int getSocketByName(char* hostName);
+void runFile(char** cmdArgs);

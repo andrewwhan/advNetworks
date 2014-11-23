@@ -100,6 +100,7 @@ void listenForHosts(){
 			fgets( cmdline, 512, stdin);
 			parseCommandLine(cmdline);
 			printf(">> ");
+			fflush(stdout);
 		}
 		if(FD_ISSET(listenSocket, &inputs)){
 			listen(listenSocket, 5);
@@ -166,6 +167,7 @@ void controllerCommandTerminal() {
 	char cmdline [514];
 	while(1){ 								// start command loop
 		printf( ">> ");
+		fflush(stdout);
 		fgets( cmdline, 512, stdin);
 		parseCommandLine(cmdline);
 	}
@@ -251,6 +253,9 @@ void executeUserCommand( char* cmdArgs[32]) {
 			case 3:
 				exitCommand(cmdArgs);
 				break;
+			case 4:
+				runFile(cmdArgs);
+				break;
 			case -1:									// error: command name not recognized
 			printf( "not valid command\n");
 			break;
@@ -260,9 +265,9 @@ void executeUserCommand( char* cmdArgs[32]) {
 }
 
 int getCommandIndex( char* cmdName) {
-	const char* cmdNames[] = { "alias", "request", "nat", "exit"};			// check command names
+	const char* cmdNames[] = { "alias", "request", "nat", "exit", "file"};			// check command names
 	int i;
-	for( i = 0; i < 4; i++) {
+	for( i = 0; i < 5; i++) {
 		if( !strcmp( cmdName, cmdNames[i])) {
 			return i;
 		}
@@ -279,4 +284,24 @@ int getSocketByName(char* hostName){
 		currentHost = currentHost->next;
 	}
 	return -1;
+}
+
+void runFile(char** cmdArgs){
+	FILE* toRun;
+	if((toRun = fopen(cmdArgs[1], "r")) != NULL){
+		int fileLeft = 1;
+		while(fileLeft){
+			char cmdLine[514];
+			if(fgets(cmdLine, 512, toRun) != 0){
+				parseCommandLine(cmdLine);
+			}
+			else{
+				fileLeft = 0;
+			}
+		}
+		fclose(toRun);
+	}
+	else{
+		printf("%s \n", strerror(errno));
+	}
 }

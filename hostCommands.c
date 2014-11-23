@@ -302,3 +302,4 @@ void cleanExit(int socket, char* messagePtr){
 	close(socket);
 	free(messagePtr);
 	exit(0);
+}

@@ -252,6 +252,7 @@ void executeUserCommand( char* cmdArgs[32]) {
 				break;
 			case 6:										// rule (firewall) command
 				ruleCommand( cmdArgs);
+				break;
 			case -1:									// error: command name not recognized
 				printf( "not valid command\n");
 				break;
@@ -261,7 +262,6 @@ void executeUserCommand( char* cmdArgs[32]) {
 }
 
 int getCommandIndex( char* cmdName) {
-<<<<<<< HEAD
 	const char* cmdNames[] = { "alias", "request", "nat", "exit", "file", "route", "rule" };			// check command names
 	int i;
 	for( i = 0; i < 7; i++) {

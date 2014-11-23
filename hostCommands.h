@@ -8,3 +8,6 @@ int showNatRule(char cid, uint tid, short dataLength, char* dataStart);
 int addRoute(char cid, uint tid, short dataLength, char* dataStart);
 int removeRoute(char cid, uint tid, short dataLength, char* dataStart);
 int showRoute(char cid, uint tid, short dataLength, char* dataStart);
+int addRule(char cid, uint tid, short dataLength, char* dataStart);
+int removeRule(char cid, uint tid, short dataLength, char* dataStart);
+int showRule(char cid, uint tid, short dataLength, char* dataStart);

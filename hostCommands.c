@@ -71,6 +71,21 @@ void receiveCommand(char* messagePtr, int socket) {
 				status = 3; // indicate that it is a show command that executed correctly
 			}
 			break;
+		case 0x05:
+			// Add rule (firewall) command
+			status = addRule(cid, tid, dataLength, dataStart);
+			break;
+		case 0x15:
+			// Remove rule (firewall) command
+			status = removeRule(cid, tid, dataLength, dataStart);
+			break;
+		case 0x25:
+			// Show rule (firewall) command
+			status = showRule(cid, tid, dataLength, dataStart);
+			if( status) {
+				status = 3; // indicate that it is a show command that executed correctly
+			}
+			break;
 		default:
 			break;
 	}
@@ -222,3 +237,61 @@ int showRoute(char cid, uint tid, short dataLength, char* dataStart) {
 
 	return success;
 }
+
+int addRule(char cid, uint tid, short dataLength, char* dataStart) {
+	char* cmdtok [32];
+	const char* delimiter = " \n";
+	int tokcnt = 1;
+	int success;
+
+	cmdtok[0] = strtok( dataStart, delimiter);			// tokenize command
+	while( cmdtok[tokcnt-1]){
+		cmdtok[tokcnt] = strtok( NULL, delimiter);
+		tokcnt++;
+	}
+
+	char* args[32] = { "ip6tables", "-I", cmdtok[3], cmdtok[4], cmdtok[5], cmdtok[6] };
+	int i = 6;
+	while (i < tokcnt) {
+		args[i] = cmdtok[i+1];
+		i++;
+	}
+	args[i] == '\0';
+	
+	success = executeArgs(args);
+	return success;
+}
+
+int removeRule(char cid, uint tid, short dataLength, char* dataStart) {
+	char* cmdtok [32];
+	const char* delimiter = " \n";
+	int tokcnt = 1;
+	int success;
+
+	cmdtok[0] = strtok( dataStart, delimiter);			// tokenize command
+	while( cmdtok[tokcnt-1]){
+		cmdtok[tokcnt] = strtok( NULL, delimiter);
+		tokcnt++;
+	}
+
+	char* args[32] = {"ip6tables", "-D", cmdtok[3], cmdtok[4], cmdtok[5] };
+	int i = 6;
+	while (i < tokcnt) {
+		args[i] = cmdtok[i+1];
+		i++;
+	}
+	args[i] == '\0';
+	
+	success = executeArgs(args);
+	return success;
+}
+
+int showRule(char cid, uint tid, short dataLength, char* dataStart) {
+
+	char* args[32] = { "ip6tables", "-L", '\0' };
+
+	int success = executeShow(args);
+
+	return success;
+}
+

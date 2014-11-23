@@ -13,7 +13,7 @@ struct hostInfo{
 };
 
 int main( int argc, char* argv[]){
-	firstHost = loadDatabase();			//Read database file for host information
+	// firstHost = loadDatabase();			//Read database file for host information
 	// listenForHosts();					// listen to establish connections to hosts
 	controllerCommandTerminal();		// start command line for user input
 }
@@ -231,8 +231,11 @@ void executeUserCommand( char* cmdArgs[32]) {
 			case 2:										// nat command
 				natCommand( cmdArgs);
 				break;
-			case 3:										// route command
+			case 5:										// route command
 				routeCommand( cmdArgs);
+				break;
+			case 6:										// rule (firewall) command
+				ruleCommand( cmdArgs);
 				break;
 			case -1:									// error: command name not recognized
 				printf( "not valid command\n");
@@ -243,9 +246,9 @@ void executeUserCommand( char* cmdArgs[32]) {
 }
 
 int getCommandIndex( char* cmdName) {
-	const char* cmdNames[] = { "alias", "request", "nat", "route"};			// check command names
+	const char* cmdNames[] = { "alias", "request", "nat", "exit", "file", "route", "rule" };			// check command names
 	int i;
-	for( i = 0; i < 4; i++) {
+	for( i = 0; i < 7; i++) {
 		if( !strcmp( cmdName, cmdNames[i])) {
 			return i;
 		}

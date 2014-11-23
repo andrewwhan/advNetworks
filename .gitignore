@@ -3,5 +3,6 @@
 *~
 hostSTDOUT.txt
 hostSTDERR.txt
+filetest.txt
 controller
 agent

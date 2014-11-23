@@ -1,7 +1,6 @@
 *.o
 *.exe
 *~
-hostSTDOUT.txt
-hostSTDERR.txt
+*.txt
 controller
 agent

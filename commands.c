@@ -144,6 +144,28 @@ void exitCommand( char** cmdArgs) {
 	sendMessage(0x0A, cmdArgs);
 }
 
+void neighCommand( char** cmdArgs) {
+	int commandIndex = getCommandIndexASR( cmdArgs[1]);
+	switch (commandIndex) {
+		case 0:			// add, expected args count = 5
+			if (countArgs(cmdArgs) == 5) sendMessage(0x08, cmdArgs);
+			else printf("Format error. Try using: neigh add [HOSTNAME] [IP ADDRESS] [HW ADDRESS]\n");
+			break;
+		case 1:			// remove, expected args count = 5
+			if (countArgs(cmdArgs) == 5) sendMessage(0x18, cmdArgs);
+			else printf("Format error. Try using: neigh remove [HOSTNAME] [IP ADDRESS] [HW ADDRESS]\n");
+			break;
+		case 2:			// show, expected args count = 3
+			if(countArgs(cmdArgs) == 3) sendMessage(0x28, cmdArgs);
+			else printf("Format error. Try using: neigh show [HOSTNAME]\n");
+			break;
+		case -1:
+			printf("Invalid neigh command. Try using: add, show, remove\n");
+			return;
+	}
+	return;
+}
+
 int getCommandIndexASR( char* cmdName) {
 	char* commandASR[] = {"add", "remove", "show"};
 	int i;

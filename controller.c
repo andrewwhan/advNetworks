@@ -256,6 +256,9 @@ void executeUserCommand( char* cmdArgs[32]) {
 			case 4:
 				runFile(cmdArgs);
 				break;
+			case 5:
+				neighCommand(cmdArgs);
+				break;
 			case -1:									// error: command name not recognized
 			printf( "not valid command\n");
 			break;
@@ -265,9 +268,9 @@ void executeUserCommand( char* cmdArgs[32]) {
 }
 
 int getCommandIndex( char* cmdName) {
-	const char* cmdNames[] = { "alias", "request", "nat", "exit", "file"};			// check command names
+	const char* cmdNames[] = { "alias", "request", "nat", "exit", "file", "neigh"};			// check command names
 	int i;
-	for( i = 0; i < 5; i++) {
+	for( i = 0; i < 6; i++) {
 		if( !strcmp( cmdName, cmdNames[i])) {
 			return i;
 		}

@@ -56,6 +56,21 @@ void receiveCommand(char* messagePtr, int socket) {
 				status = 3; // indicate that it is a show command that executed correctly
 			}
 			break;
+		case 0x08:
+			// Add neighbor command
+			status = addNeighbor(cid, tid, dataLength, dataStart);
+			break;
+		case 0x18:
+			// Remove neighbor command
+			status = removeNeighbor(cid, tid, dataLength, dataStart);
+			break;
+		case 0x28:
+			//Show neighbors command
+			status = showNeighbor(cid, tid, dataLength, dataStart);
+			if(status){
+				status = 3;	// indicate that it is a show command that executed correctly
+			}
+			break;
 		case 0x0A:
 			// Exit command
 			cleanExit(socket, messagePtr);
@@ -192,7 +207,7 @@ void sendShow(char cid, uint tid, int socket) {
 	while( j < i){
 		printf("%s", output[j]);
 		memcpy(messagePtr + msgLoc, output[j], strlen(output[j]));
-		memcpy(messagePtr + msgLoc + strlen(output[i]), &space, sizeof(char));
+		//memcpy(messagePtr + msgLoc + strlen(output[i]), &space, sizeof(char));
 		msgLoc += strlen(output[j]) + 1;
 		j++;
 	}
@@ -347,6 +362,56 @@ int removeNatRule(char cid, uint tid, short dataLength, char* dataStart) {
 int showNatRule(char cid, uint tid, short dataLength, char* dataStart) {
 
 	char* args[32] = { "ip6tables", "-t", "nat", "-L", '\0' };
+
+	int success = executeShow(args);
+
+	return success;
+}
+
+int addNeighbor(char cid, uint tid, short dataLength, char* dataStart) {
+	char* cmdtok [32];
+	const char* delimiter = " \n";
+	int tokcnt = 1;
+
+	cmdtok[0] = strtok( dataStart, delimiter);			// tokenize command
+	while( cmdtok[tokcnt-1]){
+		cmdtok[tokcnt] = strtok( NULL, delimiter);
+		tokcnt++;
+	}
+
+	char* args[32] = {"ip", "neigh", "replace", cmdtok[3], "lladdr", cmdtok[4], "dev", "eth0", '\0' };
+
+	int success = executeArgs(args);
+
+	return success;
+}
+
+int removeNeighbor(char cid, uint tid, short dataLength, char* dataStart) {
+	char* cmdtok [32];
+	const char* delimiter = " \n";
+	int tokcnt = 1;
+	int success;
+
+	cmdtok[0] = strtok( dataStart, delimiter);			// tokenize command
+	while( cmdtok[tokcnt-1]){
+		cmdtok[tokcnt] = strtok( NULL, delimiter);
+		tokcnt++;
+	}
+	
+	if(cmdtok[4] != NULL && cmdtok[3] != NULL) {
+
+		char* args[32] = {"ip", "neigh", "del", cmdtok[3], "lladdr", cmdtok[4], "dev", "eth0", '\0' };
+		success = executeArgs(args);
+	} else {
+		success = 0;
+	}
+
+	return success;
+}
+
+int showNeighbor(char cid, uint tid, short dataLength, char* dataStart) {
+
+	char* args[32] = { "ip", "neigh", "show", "nud", "permanent", "nud", "reachable", "nud", "stale", '\0' };
 
 	int success = executeShow(args);
 

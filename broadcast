@@ -1,0 +1,5 @@
+sudo ip neigh flush dev eth0
+for i in 1 2 3 4
+do
+ping6 -c 4 host$i.team3.4516.cs.wpi.edu
+done

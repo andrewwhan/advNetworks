@@ -106,7 +106,7 @@ void sendSuccess(char cid, uint tid, int socket) {
 	memcpy(messagePtr + msgLoc + strlen(successMessage), &space, sizeof(char));
 	msgLoc += strlen(successMessage) + 1;
 
-	//sendMessage(socket, messagePtr, 7+dataLength);						// message send
+	sendMessageHost(socket, messagePtr, 7+dataLength);						// message send
 	free(messagePtr);
 	return;
 }
@@ -132,7 +132,7 @@ void sendShow(char cid, uint tid, int socket) {
 	fillMessageData ( argCount, output, messagePtr);
 	*(messagePtr + 7 + dataLength) = '\0';
 
-	//sendMessage(socket, messagePtr, 7+dataLength);				// send message
+	sendMessageHost(socket, messagePtr, 7+dataLength);				// send message
 	free(messagePtr);
 	return;
 }
@@ -158,7 +158,7 @@ void sendFailure(char cid, uint tid, int socket) {
 	fillMessageData( argCount, output, messagePtr);
 	*(messagePtr + 7 + dataLength) = '\0';
 
-	//sendMessage(socket, messagePtr, 7+dataLength);				// send message
+	sendMessageHost(socket, messagePtr, 7+dataLength);				// send message
 	free(messagePtr);
 	return;
 }

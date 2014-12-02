@@ -5,3 +5,7 @@ void exitCommand( char** cmdArgs);
 void awaitResponse( int sockinfo);
 int countArgs( char** cmdArgs);
 void neighCommand( char** cmdArgs);
+void routeCommand( char** cmdArgs);
+void fireruleCommand( char** cmdArgs);
+void ruleCommand( char** cmdArgs);
+void tableCommand( char** cmdArgs);

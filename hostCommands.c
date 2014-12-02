@@ -87,226 +87,43 @@ void receiveCommand(char* messagePtr, int socket) {
 	return;
 }
 
+char** tokenizeData(char* dataStart){
+	char** cmdtok = (char**) malloc(sizeof(char*)*32);
+	const char* delimiter = " \n";
+	int tokcnt = 1;
+
+	cmdtok[0] = strtok( dataStart, delimiter);			// tokenize command
+	while( cmdtok[tokcnt-1]){
+		cmdtok[tokcnt] = strtok( NULL, delimiter);
+		tokcnt++;
+	}
+	return cmdtok;
+}
+
 /* Command Specific Function Template
 void function(char cid, uint tid, short dataLength, char* dataStart){
 	
 }
 */
 
-int executeArgs(char* args[]) {
-
-	FILE* seFile;
-	seFile = fopen("hostSTDERR.txt", "w");
-	pid_t  pid;
-	int    status;
-
-	if ((pid = fork()) < 0) {					/* fork a child process		*/
-		printf("*** ERROR: forking child process failed\n");
-		exit(1);
-	} else if (pid == 0) {						/* for the child process:	*/
-		dup2(fileno(seFile), STDERR_FILENO);
-		fclose(seFile);
-		if (execvp(args[0], args) < 0) {		/* execute the command		*/
-			printf("*** ERROR: exec failed\n");
-			exit(1);
-		}
-		exit(0);
-	} else {									/* for the parent:		*/
-		while (wait(&status) != pid);			/* wait for completion		*/
-	}
-	return !status; // convert to true/false value
-}
-
-int executeShow(char* args[]) {
-	printf("show\n");
-	FILE* soFile;
-	soFile = fopen("hostSTDOUT.txt", "w");
-	int status;
-	pid_t   childpid;
-
-	if((childpid = fork()) == -1) {
-		perror("fork");
-		exit(1);
-	}
-	if(childpid == 0) {
-			dup2(fileno(soFile), STDOUT_FILENO);
-			fclose(soFile);
-			if (execvp(args[0], args) < 0) {
-				printf("*** ERROR: exec failed\n");
-				exit(1);
-			}
-			exit(0);
-	} else {
-		while (wait(&status) != childpid);			/* wait for completion		*/
-	}
-	return !status; // convert to true/false value
-}
-
-void sendSuccess(char cid, uint tid, int socket) {
-	printf("success\n");
-
-	short dataLength = 0;
-	int msgLoc = 0;
-	char space = ' ';
-	char* successMessage = "Success! specified command was executed\0";
-
-	dataLength += strlen(successMessage) + 1;
-
-	char* messagePtr = malloc(sizeof(char) * (HEADER + dataLength));
-	memcpy(messagePtr + msgLoc, &cid, 1);
-	msgLoc++;
-	memcpy(messagePtr + msgLoc, &tid, sizeof(uint));
-	msgLoc += 4;
-	memcpy(messagePtr + msgLoc, &dataLength, sizeof(short));
-	msgLoc += 2;
-
-	memcpy(messagePtr + msgLoc, successMessage, strlen(successMessage));
-	memcpy(messagePtr + msgLoc + strlen(successMessage), &space, sizeof(char));
-	msgLoc += strlen(successMessage) + 1;
-
-	*(messagePtr + 7 + dataLength) = '\0';
-
-	if(send(socket, messagePtr, 7+dataLength, 0) == -1){
-		printf("Send error \n");
-		close(socket);
-		free(messagePtr);
-		return;
-	}
-	free(messagePtr);
-	return;
-}
-
-void sendShow(char cid, uint tid, int socket) {
-	printf("show success\n");
-
-	FILE* soFile;
-	soFile = fopen("hostSTDOUT.txt", "r");
-	short dataLength = 0;
-	int msgLoc = 0;
-	char space = ' ';
-
-	char output[50][128];
-	int i = 0;
-
-	while(fgets(output[i], 128, soFile) != NULL) { //As long as there are still arguments
-		dataLength += (short) strlen(output[i]) + 1;
-		//printf("current dataLength: %hd of output: %s", dataLength, output[i]);
-		i++;
-	}
-	//printf("\n");
-
-	char* messagePtr = malloc(sizeof(char) * (HEADER + dataLength));
-	memcpy(messagePtr + msgLoc, &cid, 1);
-	msgLoc++;
-	memcpy(messagePtr + msgLoc, &tid, sizeof(uint));
-	msgLoc += 4;
-	memcpy(messagePtr + msgLoc, &dataLength, sizeof(short));
-	msgLoc += 2;
-
-	int j=0;
-	while( j < i){
-		printf("%s", output[j]);
-		memcpy(messagePtr + msgLoc, output[j], strlen(output[j]));
-		//memcpy(messagePtr + msgLoc + strlen(output[i]), &space, sizeof(char));
-		msgLoc += strlen(output[j]) + 1;
-		j++;
-	}
-	*(messagePtr + 7 + dataLength) = '\0';
-
-	if(send(socket, messagePtr, 7+dataLength, 0) == -1){
-		printf("Send error \n");
-		close(socket);
-		fclose(soFile);
-		free(messagePtr);
-		return;
-	}
-	fclose(soFile);
-	free(messagePtr);
-	return;
-}
-
-void sendFailure(char cid, uint tid, int socket) {
-	printf("failure\n");
-	FILE* seFile;
-	seFile = fopen("hostSTDERR.txt", "r");
-	short dataLength = 0;
-	int msgLoc = 0;
-	char space = ' ';
-
-	char output[50][128];
-	int i = 0;
-
-	while(fgets(output[i], 128, seFile) != NULL) { //As long as there are still arguments
-		dataLength += strlen(output[i]) + 1;
-		i++;
-	}
-	fclose(seFile);
-	char* messagePtr = malloc(sizeof(char) * (HEADER + dataLength));
-	memcpy(messagePtr + msgLoc, &cid, 1);
-	msgLoc++;
-	memcpy(messagePtr + msgLoc, &tid, sizeof(uint));
-	msgLoc += 4;
-	memcpy(messagePtr + msgLoc, &dataLength, sizeof(short));
-	msgLoc += 2;
-
-	int j=0;
-	while( j < i){
-		printf("%s", output[j]);
-		memcpy(messagePtr + msgLoc, output[j], strlen(output[j]));
-		memcpy(messagePtr + msgLoc + strlen(output[i]), &space, sizeof(char));
-		msgLoc += strlen(output[j]) + 1;
-		j++;
-	}
-	printf("\n");
-
-	if(send(socket, messagePtr, 7+dataLength, 0) == -1){
-		printf("Send error \n");
-		close(socket);
-		free(messagePtr);
-		return;
-	}
-	free(messagePtr);
-	return;
-}
-
 int addIPv6Alias(char cid, uint tid, short dataLength, char* dataStart) {
-	char* cmdtok [32];
-	const char* delimiter = " \n";
-	int tokcnt = 1;
-
-	cmdtok[0] = strtok( dataStart, delimiter);			// tokenize command
-	while( cmdtok[tokcnt-1]){
-		cmdtok[tokcnt] = strtok( NULL, delimiter);
-		tokcnt++;
-	}
+	char** cmdtok = tokenizeData(dataStart);
 
 	char* args[32] = {"ifconfig", cmdtok[4], "inet6", "add", cmdtok[3], '\0' };
 
 	int success = executeArgs(args);
 
+	free(cmdtok);
 	return success;
 }
 
 int removeIPv6Alias(char cid, uint tid, short dataLength, char* dataStart) {
-	char* cmdtok [32];
-	const char* delimiter = " \n";
-	int tokcnt = 1;
-	int success;
+	char** cmdtok = tokenizeData(dataStart);
 
-	cmdtok[0] = strtok( dataStart, delimiter);			// tokenize command
-	while( cmdtok[tokcnt-1]){
-		cmdtok[tokcnt] = strtok( NULL, delimiter);
-		tokcnt++;
-	}
-	
-	if(cmdtok[4] != NULL && cmdtok[3] != NULL) {
+	char* args[32] = {"ifconfig", cmdtok[4], "inet6", "del", cmdtok[3], '\0' };
+	int success = executeArgs(args);
 
-		char* args[32] = {"ifconfig", cmdtok[4], "inet6", "del", cmdtok[3], '\0' };
-		success = executeArgs(args);
-	} else {
-		success = 0;
-	}
-
+	free(cmdtok);
 	return success;
 }
 
@@ -319,65 +136,8 @@ int showIPv6Alias(char cid, uint tid, short dataLength, char* dataStart) {
 	return success;
 }
 
-int addNatRule(char cid, uint tid, short dataLength, char* dataStart) {
-	char* cmdtok [32];
-	const char* delimiter = " \n";
-	int tokcnt = 1;
-
-	cmdtok[0] = strtok( dataStart, delimiter);			// tokenize command
-	while( cmdtok[tokcnt-1]){
-		cmdtok[tokcnt] = strtok( NULL, delimiter);
-		tokcnt++;
-	}
-
-	char* args[32] = {"ip6tables", "-t", "nat", "-I", cmdtok[3], cmdtok[4], "-p", "tcp",
-		cmdtok[5], cmdtok[6], cmdtok[7], cmdtok[8], cmdtok[9], cmdtok[10], '\0' };
-	int i = 0;
-
-	int success = executeArgs(args);
-
-	return success;
-}
-
-int removeNatRule(char cid, uint tid, short dataLength, char* dataStart) {
-	char* cmdtok [32];
-	const char* delimiter = " \n";
-	int tokcnt = 1;
-
-	cmdtok[0] = strtok( dataStart, delimiter);			// tokenize command
-	while( cmdtok[tokcnt-1]){
-		cmdtok[tokcnt] = strtok( NULL, delimiter);
-		tokcnt++;
-	}
-
-	char* args[32] = {"ip6tables", "-t", "nat", "-D", cmdtok[3], "-p", "tcp",
-		cmdtok[4], cmdtok[5], cmdtok[6], cmdtok[7], cmdtok[8], cmdtok[9], '\0' };
-	int i = 0;
-
-	int success = executeArgs(args);
-
-	return success;
-}
-
-int showNatRule(char cid, uint tid, short dataLength, char* dataStart) {
-
-	char* args[32] = { "ip6tables", "-t", "nat", "-L", '\0' };
-
-	int success = executeShow(args);
-
-	return success;
-}
-
 int addNeighbor(char cid, uint tid, short dataLength, char* dataStart) {
-	char* cmdtok [32];
-	const char* delimiter = " \n";
-	int tokcnt = 1;
-
-	cmdtok[0] = strtok( dataStart, delimiter);			// tokenize command
-	while( cmdtok[tokcnt-1]){
-		cmdtok[tokcnt] = strtok( NULL, delimiter);
-		tokcnt++;
-	}
+	char** cmdtok = tokenizeData(dataStart);
 
 	char* args[32] = {"ip", "neigh", "replace", cmdtok[3], "lladdr", cmdtok[4], "dev", "eth0", '\0' };
 
@@ -387,16 +147,8 @@ int addNeighbor(char cid, uint tid, short dataLength, char* dataStart) {
 }
 
 int removeNeighbor(char cid, uint tid, short dataLength, char* dataStart) {
-	char* cmdtok [32];
-	const char* delimiter = " \n";
-	int tokcnt = 1;
 	int success;
-
-	cmdtok[0] = strtok( dataStart, delimiter);			// tokenize command
-	while( cmdtok[tokcnt-1]){
-		cmdtok[tokcnt] = strtok( NULL, delimiter);
-		tokcnt++;
-	}
+	char** cmdtok = tokenizeData(dataStart);
 	
 	if(cmdtok[4] != NULL && cmdtok[3] != NULL) {
 
@@ -413,6 +165,221 @@ int showNeighbor(char cid, uint tid, short dataLength, char* dataStart) {
 
 	char* args[32] = { "ip", "neigh", "show", "nud", "permanent", "nud", "reachable", "nud", "stale", '\0' };
 
+	int success = executeShow(args);
+
+	return success;
+}
+
+int addNatRule(char cid, uint tid, short dataLength, char* dataStart) {
+	char** cmdtok = tokenizeData(dataStart);
+
+	char* args[32] = {"ip6tables", "-t", "nat", "-I", cmdtok[3], cmdtok[4], "-p", "tcp",
+		cmdtok[5], cmdtok[6], cmdtok[7], cmdtok[8], cmdtok[9], cmdtok[10], '\0' };
+
+	int success = executeArgs(args);
+
+	free(cmdtok);
+	return success;
+}
+
+int removeNatRule(char cid, uint tid, short dataLength, char* dataStart) {
+	char** cmdtok = tokenizeData(dataStart);
+	
+	char* args[32] = {"ip6tables", "-t", "nat", "-D", cmdtok[3], "-p", "tcp",
+		cmdtok[4], cmdtok[5], cmdtok[6], cmdtok[7], cmdtok[8], cmdtok[9], '\0' };
+
+	int success = executeArgs(args);
+
+	free(cmdtok);
+	return success;
+}
+
+int showNatRule(char cid, uint tid, short dataLength, char* dataStart) {
+
+	char* args[32] = { "ip6tables", "-t", "nat", "-L", '\0' };
+
+	int success = executeShow(args);
+
+	return success;
+}
+
+int addRoute(char cid, uint tid, short dataLength, char* dataStart) {
+	char* cmdtok [32];
+	const char* delimiter = " \n";
+	int tokcnt = 1;
+
+	cmdtok[0] = strtok( dataStart, delimiter);			// tokenize command
+	while( cmdtok[tokcnt-1]){
+		cmdtok[tokcnt] = strtok( NULL, delimiter);
+		tokcnt++;
+	}
+
+	char* args[32] = {"ip", "-6", "route", "add"};
+	int i = 4;
+	while (i < tokcnt) {
+		args[i] = cmdtok[i-1];
+		i++;
+	}
+	args[i] == '\0';
+
+	int success = executeArgs(args);
+
+	return success;
+}
+
+int removeRoute(char cid, uint tid, short dataLength, char* dataStart) {
+	char* cmdtok [32];
+	const char* delimiter = " \n";
+	int tokcnt = 1;
+	int success;
+
+	cmdtok[0] = strtok( dataStart, delimiter);			// tokenize command
+	while( cmdtok[tokcnt-1]){
+		cmdtok[tokcnt] = strtok( NULL, delimiter);
+		tokcnt++;
+	}
+
+	char* args[32] = {"ip", "-6", "route", "del"};
+	int i = 4;
+	while (i < tokcnt) {
+		args[i] = cmdtok[i-1];
+		i++;
+	}
+	args[i] == '\0';
+	
+	success = executeArgs(args);
+	return success;
+}
+
+int showRoute(char cid, uint tid, short dataLength, char* dataStart) {
+	char** cmdtok = tokenizeData(dataStart);
+
+	char* args[32] = { "ip", "-6", "route", "show", "table", cmdtok[3], '\0' };
+
+	int success = executeShow(args);
+
+	return success;
+}
+
+int addRule(char cid, uint tid, short dataLength, char* dataStart) {
+	char* cmdtok [32];
+	const char* delimiter = " \n";
+	int tokcnt = 1;
+	int success;
+
+	cmdtok[0] = strtok( dataStart, delimiter);			// tokenize command
+	while( cmdtok[tokcnt-1]){
+		cmdtok[tokcnt] = strtok( NULL, delimiter);
+		tokcnt++;
+	}
+
+	char* args[32] = { "ip6tables", "-I", cmdtok[3], cmdtok[4], cmdtok[5], cmdtok[6] };
+	int i = 6;
+	while (i < tokcnt) {
+		args[i] = cmdtok[i+1];
+		i++;
+	}
+	args[i] == '\0';
+	
+	success = executeArgs(args);
+	return success;
+}
+
+int removeRule(char cid, uint tid, short dataLength, char* dataStart) {
+	char* cmdtok [32];
+	const char* delimiter = " \n";
+	int tokcnt = 1;
+	int success;
+
+	cmdtok[0] = strtok( dataStart, delimiter);			// tokenize command
+	while( cmdtok[tokcnt-1]){
+		cmdtok[tokcnt] = strtok( NULL, delimiter);
+		tokcnt++;
+	}
+
+	char* args[32] = {"ip6tables", "-D", cmdtok[3], cmdtok[4], cmdtok[5] };
+	int i = 6;
+	while (i < tokcnt) {
+		args[i] = cmdtok[i+1];
+		i++;
+	}
+	args[i] == '\0';
+	
+	success = executeArgs(args);
+	return success;
+}
+
+int showRule(char cid, uint tid, short dataLength, char* dataStart) {
+
+	char* args[32] = { "ip6tables", "-L", '\0' };
+
+	int success = executeShow(args);
+
+	return success;
+}
+
+int addTable(char cid, uint tid, short dataLength, char* dataStart) {
+
+	char** cmdtok = tokenizeData(dataStart);
+
+	FILE* tableFile;
+	FILE* newTableFile;
+	tableFile = fopen("/etc/iproute2/rt_tables", "r");
+	//tableFile = fopen("rt_tables2", "r");
+	
+	char output[50][128];
+	int argCount = 0;
+
+	int end = 0;
+	while(argCount < 11) {		// get data from output file
+		if(fgets(output[argCount], 128, tableFile) != NULL){
+			argCount++;
+		}
+	}
+	
+	int tableId;
+	char name[128];
+	char tab[2] = {'	', '\0'};
+	char endLine[2] = {'\n', '\0'};
+	end = fscanf(tableFile, "%d %s", &tableId, name);
+	while(end != EOF){			// keep adding extra tables
+		argCount++;
+		sprintf(output[argCount], "%d", tableId);
+		strcat(output[argCount], tab);
+		strcat(output[argCount], name);
+		strcat(output[argCount], endLine);
+		printf("%s", output[argCount]);
+		end = fscanf(tableFile, "%d %s", &tableId, name);
+	}
+	fclose(tableFile);
+	
+	argCount++;					// construct and add the new entrie
+	tableId++;
+	sprintf(output[argCount], "%d", tableId);
+	strcat(output[argCount], tab);
+	strcat(output[argCount], cmdtok[3]);
+	strcat(output[argCount], endLine);
+
+	newTableFile = fopen("/etc/iproute2/rt_tables", "w");
+
+	int i=0;
+	while(i < argCount+1) {		// rewrite the file with new data
+		printf("%s", output[i]);
+		fputs(output[i], tableFile);
+		i++;
+	}
+	
+	fclose(newTableFile);
+	
+	return 1;
+}
+
+int removeTable(char cid, uint tid, short dataLength, char* dataStart) {
+
+	char** cmdtok = tokenizeData(dataStart);
+
+	char* args[32] = { "ip", "route", "flush", "table", cmdtok[3], '\0' };
+	
 	int success = executeShow(args);
 
 	return success;

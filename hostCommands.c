@@ -86,6 +86,14 @@ void receiveCommand(char* messagePtr, int socket) {
 				status = 3; // indicate that it is a show command that executed correctly
 			}
 			break;
+		case 0x06:
+			// Add route table command
+			status = addTable(cid, tid, dataLength, dataStart);
+			break;
+		case 0x16:
+			// remove route table command
+			status = removeTable(cid, tid, dataLength, dataStart);
+			break;
 		case 0x0A:
 			// Exit command
 			cleanExit(socket, messagePtr);
@@ -233,8 +241,9 @@ int removeRoute(char cid, uint tid, short dataLength, char* dataStart) {
 }
 
 int showRoute(char cid, uint tid, short dataLength, char* dataStart) {
+	char** cmdtok = tokenizeData(dataStart);
 
-	char* args[32] = { "route", "-A", "inet6", '\0' };
+	char* args[32] = { "ip", "-6", "route", "show", "table", cmdtok[3], '\0' };
 
 	int success = executeShow(args);
 
@@ -293,6 +302,73 @@ int showRule(char cid, uint tid, short dataLength, char* dataStart) {
 
 	char* args[32] = { "ip6tables", "-L", '\0' };
 
+	int success = executeShow(args);
+
+	return success;
+}
+
+int addTable(char cid, uint tid, short dataLength, char* dataStart) {
+
+	char** cmdtok = tokenizeData(dataStart);
+
+	FILE* tableFile;
+	FILE* newTableFile;
+	tableFile = fopen("/etc/iproute2/rt_tables", "r");
+	//tableFile = fopen("rt_tables2", "r");
+	
+	char output[50][128];
+	int argCount = 0;
+
+	int end = 0;
+	while(argCount < 11) {		// get data from output file
+		if(fgets(output[argCount], 128, tableFile) != NULL){
+			argCount++;
+		}
+	}
+	
+	int tableId;
+	char name[128];
+	char tab[2] = {'	', '\0'};
+	char endLine[2] = {'\n', '\0'};
+	end = fscanf(tableFile, "%d %s", &tableId, name);
+	while(end != EOF){			// keep adding extra tables
+		argCount++;
+		sprintf(output[argCount], "%d", tableId);
+		strcat(output[argCount], tab);
+		strcat(output[argCount], name);
+		strcat(output[argCount], endLine);
+		printf("%s", output[argCount]);
+		end = fscanf(tableFile, "%d %s", &tableId, name);
+	}
+	fclose(tableFile);
+	
+	argCount++;					// construct and add the new entrie
+	tableId++;
+	sprintf(output[argCount], "%d", tableId);
+	strcat(output[argCount], tab);
+	strcat(output[argCount], cmdtok[3]);
+	strcat(output[argCount], endLine);
+
+	newTableFile = fopen("/etc/iproute2/rt_tables", "w");
+
+	int i=0;
+	while(i < argCount+1) {		// rewrite the file with new data
+		printf("%s", output[i]);
+		fputs(output[i], tableFile);
+		i++;
+	}
+	
+	fclose(newTableFile);
+	
+	return 1;
+}
+
+int removeTable(char cid, uint tid, short dataLength, char* dataStart) {
+
+	char** cmdtok = tokenizeData(dataStart);
+
+	char* args[32] = { "ip", "route", "flush", "table", cmdtok[3], '\0' };
+	
 	int success = executeShow(args);
 
 	return success;

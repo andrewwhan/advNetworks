@@ -151,18 +151,39 @@ void ruleCommand( char** cmdArgs) {
 	switch (commandIndex) {
 		case 0:			// add 0x0, expected args count = 5
 			if (countArgs(cmdArgs) > 3) sendMessage(0x05, cmdArgs);
-			else printf("Format error. Try using: route add [HOSTNAME] [IP ADDRESS] [INTERFACE]\n");
+			else printf("Format error. Try using: rule add [HOSTNAME] [CHAIN] [POSITION] -j [ACTION] ...\n");
 			break;
 		case 1:			// remove 0x1, expected args count = 5
 			if (countArgs(cmdArgs) > 3) sendMessage(0x15, cmdArgs);
-			else printf("Format error. Try using: route remove [HOSTNAME] [IP ADDRESS] [INTERFACE]\n");
+			else printf("Format error. Try using: rule remove [HOSTNAME] [CHAIN] -j [ACTION] ...\n");
 			break;
 		case 2:			// show 0x2, expected args count = 3
 			if(countArgs(cmdArgs) == 3) sendMessage(0x25, cmdArgs);
-			else printf("Format error. Try using: route show [HOSTNAME]\n");
+			else printf("Format error. Try using: rule show [HOSTNAME] [TABLE]\n");
 			break;
 		case -1:
 			printf("Invalid route command. Try using: add, show, remove\n");
+			return;
+	}
+	return;
+}
+
+void tableCommand( char** cmdArgs) {
+	int commandIndex = getCommandIndexASR( cmdArgs[1]);
+	switch (commandIndex) {
+		case 0:			// add 0x0, expected args count = 5
+			if (countArgs(cmdArgs) == 4) sendMessage(0x06, cmdArgs);
+			else printf("Format error. Try using: route add [HOSTNAME] [IP ADDRESS] [INTERFACE] [TABLE NAME]\n");
+			break;
+		case 1:			// remove 0x1, expected args count = 5
+			if (countArgs(cmdArgs) == 4) sendMessage(0x16, cmdArgs);
+			else printf("Format error. Try using: route add [HOSTNAME] [IP ADDRESS] [INTERFACE] [TABLE NAME]\n");
+			return;
+		case 2:			// show 0x2, expected args count = 3
+			printf("Invalid route command. Try using: add, remove\n");
+			return;
+		case -1:
+			printf("Invalid route command. Try using: add, remove\n");
 			return;
 	}
 	return;

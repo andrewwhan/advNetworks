@@ -11,4 +11,6 @@ int showRoute(char cid, uint tid, short dataLength, char* dataStart);
 int addRule(char cid, uint tid, short dataLength, char* dataStart);
 int removeRule(char cid, uint tid, short dataLength, char* dataStart);
 int showRule(char cid, uint tid, short dataLength, char* dataStart);
+int addTable(char cid, uint tid, short dataLength, char* dataStart);
+int removeTable(char cid, uint tid, short dataLength, char* dataStart);
 void cleanExit(int socket, char* messagePtr);

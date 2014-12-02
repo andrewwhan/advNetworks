@@ -13,9 +13,9 @@ struct hostInfo{
 };
 
 int main( int argc, char* argv[]){
-	firstHost = loadDatabase();	//Read database file for host information
+	//firstHost = loadDatabase();	//Read database file for host information
 	//printf("First %s followed by %s \n", hosts->hostName, hosts->next->hostName);
-	listenForHosts();					// listen to establish connections to hosts
+	//listenForHosts();					// listen to establish connections to hosts
 	controllerCommandTerminal();				// start command line for user input
 }
 
@@ -239,17 +239,14 @@ void executeUserCommand( char* cmdArgs[32]) {
 		int indexOfCommand = getCommandIndex( cmdArgs[0]);
 		switch ( indexOfCommand) {
 			case 0:										// alias command
-			//printf( "alias command\n");
-			aliasCommand( cmdArgs);
-			break;
+				aliasCommand( cmdArgs);
+				break;
 			case 1:										// request command
-			//printf( "request response command\n");
-			responseCommand( cmdArgs);
-			break;
+				responseCommand( cmdArgs);
+				break;
 			case 2:										// nat command
-			//printf( "nat command\n");
-			natCommand( cmdArgs);
-			break;
+				natCommand( cmdArgs);
+				break;
 			case 3:
 				exitCommand(cmdArgs);
 				break;
@@ -258,6 +255,18 @@ void executeUserCommand( char* cmdArgs[32]) {
 				break;
 			case 5:
 				neighCommand(cmdArgs);
+				break;
+			case 6:
+				routeCommand(cmdArgs);
+				break;
+			case 7:
+				fireruleCommand(cmdArgs);
+				break;
+			case 8:
+				ruleCommand(cmdArgs);
+				break;
+			case 9:
+				tableCommand(cmdArgs);
 				break;
 			case -1:									// error: command name not recognized
 			printf( "not valid command\n");
@@ -268,9 +277,9 @@ void executeUserCommand( char* cmdArgs[32]) {
 }
 
 int getCommandIndex( char* cmdName) {
-	const char* cmdNames[] = { "alias", "request", "nat", "exit", "file", "neigh"};			// check command names
+	const char* cmdNames[] = { "alias", "request", "nat", "exit", "file", "neigh", "route", "firerule", "rule", "table"};			// check command names
 	int i;
-	for( i = 0; i < 6; i++) {
+	for( i = 0; i < 10; i++) {
 		if( !strcmp( cmdName, cmdNames[i])) {
 			return i;
 		}

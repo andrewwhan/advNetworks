@@ -37,6 +37,21 @@ void receiveCommand(char* messagePtr, int socket) {
 				status = 3; // indicate that it is a show command that executed correctly
 			}
 			break;
+		case 0x01:
+			// Add alias route command
+			status = addRoute(cid, tid, dataLength, dataStart);
+			break;
+		case 0x11:
+			// Remove alias route command
+			status = removeRoute(cid, tid, dataLength, dataStart);
+			break;
+		case 0x21:
+			// Show alias route command
+			status = showRoute(cid, tid, dataLength, dataStart);
+			if( status) {
+				status = 3; // indicate that it is a show command that executed correctly
+			}
+			break;
 		case 0x32:
 			// Request response from host command
 			status = !0; // send success response
@@ -52,6 +67,44 @@ void receiveCommand(char* messagePtr, int socket) {
 		case 0x23:
 			// Show nat rules command
 			status = showNatRule(cid, tid, dataLength, dataStart);
+			if( status) {
+				status = 3; // indicate that it is a show command that executed correctly
+			}
+			break;
+		case 0x05:
+			// Add fire rule command
+			status = addFireRule(cid, tid, dataLength, dataStart);
+			break;
+		case 0x15:
+			// Remove fire rule command
+			status = removeFireRule(cid, tid, dataLength, dataStart);
+			break;
+		case 0x25:
+			// Show fire rules command
+			status = showFireRule(cid, tid, dataLength, dataStart);
+			if( status) {
+				status = 3; // indicate that it is a show command that executed correctly
+			}
+			break;
+		case 0x06:
+			// Add table command
+			status = addTable(cid, tid, dataLength, dataStart);
+			break;
+		case 0x16:
+			// Remove table command
+			status = removeTable(cid, tid, dataLength, dataStart);
+			break;
+		case 0x07:
+			// Add table rule command
+			status = addRule(cid, tid, dataLength, dataStart);
+			break;
+		case 0x17:
+			// Remove table rule command
+			status = removeRule(cid, tid, dataLength, dataStart);
+			break;
+		case 0x27:
+			// Show table rules command
+			status = showRule(cid, tid, dataLength, dataStart);
 			if( status) {
 				status = 3; // indicate that it is a show command that executed correctly
 			}
@@ -261,7 +314,7 @@ int showRoute(char cid, uint tid, short dataLength, char* dataStart) {
 	return success;
 }
 
-int addRule(char cid, uint tid, short dataLength, char* dataStart) {
+int addFireRule(char cid, uint tid, short dataLength, char* dataStart) {
 	char* cmdtok [32];
 	const char* delimiter = " \n";
 	int tokcnt = 1;
@@ -285,7 +338,7 @@ int addRule(char cid, uint tid, short dataLength, char* dataStart) {
 	return success;
 }
 
-int removeRule(char cid, uint tid, short dataLength, char* dataStart) {
+int removeFireRule(char cid, uint tid, short dataLength, char* dataStart) {
 	char* cmdtok [32];
 	const char* delimiter = " \n";
 	int tokcnt = 1;
@@ -309,7 +362,7 @@ int removeRule(char cid, uint tid, short dataLength, char* dataStart) {
 	return success;
 }
 
-int showRule(char cid, uint tid, short dataLength, char* dataStart) {
+int showFireRule(char cid, uint tid, short dataLength, char* dataStart) {
 
 	char* args[32] = { "ip6tables", "-L", '\0' };
 
@@ -380,6 +433,64 @@ int removeTable(char cid, uint tid, short dataLength, char* dataStart) {
 
 	char* args[32] = { "ip", "route", "flush", "table", cmdtok[3], '\0' };
 	
+	int success = executeShow(args);
+
+	return success;
+}
+
+int addRule(char cid, uint tid, short dataLength, char* dataStart) {
+	char* cmdtok [32];
+	const char* delimiter = " \n";
+	int tokcnt = 1;
+	int success;
+
+	cmdtok[0] = strtok( dataStart, delimiter);			// tokenize command
+	while( cmdtok[tokcnt-1]){
+		cmdtok[tokcnt] = strtok( NULL, delimiter);
+		tokcnt++;
+	}
+
+	char* args[32] = {"ip", "-6", "rule", "add", cmdtok[3], cmdtok[4], cmdtok[5], cmdtok[6] };
+	int i = 6;
+	while (i < tokcnt) {
+		args[i] = cmdtok[i+1];
+		i++;
+	}
+	args[i] == '\0';
+	
+	success = executeArgs(args);
+	return success;
+}
+
+int removeRule(char cid, uint tid, short dataLength, char* dataStart) {
+	char* cmdtok [32];
+	const char* delimiter = " \n";
+	int tokcnt = 1;
+	int success;
+
+	cmdtok[0] = strtok( dataStart, delimiter);			// tokenize command
+	while( cmdtok[tokcnt-1]){
+		cmdtok[tokcnt] = strtok( NULL, delimiter);
+		tokcnt++;
+	}
+
+	char* args[32] = {"ip", "-6", "rule", "del", cmdtok[3], cmdtok[4], cmdtok[5], cmdtok[6] };
+	int i = 6;
+	while (i < tokcnt) {
+		args[i] = cmdtok[i+1];
+		i++;
+	}
+	args[i] == '\0';
+	
+	success = executeArgs(args);
+	return success;
+}
+
+int showRule(char cid, uint tid, short dataLength, char* dataStart) {
+	char** cmdtok = tokenizeData(dataStart);
+
+	char* args[32] = { "ip", "-6", "rule", "show", '\0' };
+
 	int success = executeShow(args);
 
 	return success;

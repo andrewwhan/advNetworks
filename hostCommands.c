@@ -390,11 +390,13 @@ int addTable(char cid, uint tid, short dataLength, char* dataStart) {
 		}
 	}
 	
-	int tableId;
+	int tableId = 0;
+	printf("tableId: %d\n", tableId);
 	char name[128];
 	char tab[2] = {'	', '\0'};
 	char endLine[2] = {'\n', '\0'};
 	end = fscanf(tableFile, "%d %s", &tableId, name);
+	printf("tableId: %d\n", tableId);
 	while(end != EOF){			// keep adding extra tables
 		argCount++;
 		sprintf(output[argCount], "%d", tableId);
@@ -407,18 +409,21 @@ int addTable(char cid, uint tid, short dataLength, char* dataStart) {
 	fclose(tableFile);
 	
 	argCount++;					// construct and add the new entrie
+
 	tableId++;
+	printf("tableId: %d\n", tableId);
 	sprintf(output[argCount], "%d", tableId);
 	strcat(output[argCount], tab);
 	strcat(output[argCount], cmdtok[3]);
 	strcat(output[argCount], endLine);
+	printf("%s \n", output[argCount]);
 
 	newTableFile = fopen("/etc/iproute2/rt_tables", "w");
 
 	int i=0;
 	while(i < argCount+1) {		// rewrite the file with new data
 		printf("%s", output[i]);
-		fputs(output[i], tableFile);
+		fputs(output[i], newTableFile);
 		i++;
 	}
 	

@@ -214,15 +214,15 @@ void ruleCommand( char** cmdArgs) {
 	int commandIndex = getCommandIndexASR( cmdArgs[1]);
 	switch (commandIndex) {
 		case 0:			// add 0x0, expected args count = 5
-			if (countArgs(cmdArgs) > 3) sendMessage(0x05, cmdArgs);
+			if (countArgs(cmdArgs) > 3) sendMessage(0x07, cmdArgs);
 			else printf("Format error. Try using: rule add [HOSTNAME] from [ADDRESS] table [TABLE NAME]\n");
 			break;
 		case 1:			// remove 0x1, expected args count = 5
-			if (countArgs(cmdArgs) > 3) sendMessage(0x15, cmdArgs);
+			if (countArgs(cmdArgs) > 3) sendMessage(0x17, cmdArgs);
 			else printf("Format error. Try using: rule remove [HOSTNAME] from [ADDRESS] table [TABLE NAME]\n");
 			break;
 		case 2:			// show 0x2, expected args count = 3
-			if(countArgs(cmdArgs) == 3) sendMessage(0x25, cmdArgs);
+			if(countArgs(cmdArgs) == 3) sendMessage(0x27, cmdArgs);
 			else printf("Format error. Try using: rule show [HOSTNAME]\n");
 			break;
 		case -1:

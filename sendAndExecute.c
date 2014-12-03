@@ -100,7 +100,7 @@ void sendSuccess(char cid, uint tid, int socket) {
 
 	dataLength += strlen(successMessage) + 1;
 	char* messagePtr = constructHeader(cid, tid, dataLength);			// construct message
-	msgLoc = 6;
+	msgLoc = 7;
 
 	memcpy(messagePtr + msgLoc, successMessage, strlen(successMessage));
 	memcpy(messagePtr + msgLoc + strlen(successMessage), &space, sizeof(char));
@@ -159,6 +159,6 @@ void sendFailure(char cid, uint tid, int socket) {
 	*(messagePtr + 7 + dataLength) = '\0';
 
 	sendMessageHost(socket, messagePtr, 7+dataLength);			// send message
-	free(messagePtr);
+	//free(messagePtr);
 	return;
 }

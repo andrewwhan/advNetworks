@@ -386,6 +386,7 @@ int addTable(char cid, uint tid, short dataLength, char* dataStart) {
 	int end = 0;
 	while(argCount < 11) {		// get data from output file
 		if(fgets(output[argCount], 128, tableFile) != NULL){
+			printf("%d, %s \n", argCount, output[argCount]);
 			argCount++;
 		}
 	}
@@ -398,17 +399,17 @@ int addTable(char cid, uint tid, short dataLength, char* dataStart) {
 	end = fscanf(tableFile, "%d %s", &tableId, name);
 	printf("tableId: %d\n", tableId);
 	while(end != EOF){			// keep adding extra tables
-		argCount++;
+		output[argCount][0] = '\0';
 		sprintf(output[argCount], "%d", tableId);
 		strcat(output[argCount], tab);
 		strcat(output[argCount], name);
 		strcat(output[argCount], endLine);
 		printf("%s", output[argCount]);
 		end = fscanf(tableFile, "%d %s", &tableId, name);
+		printf("Table: %d, %s \n", tableId, name);
+		argCount++;
 	}
 	fclose(tableFile);
-	
-	argCount++;					// construct and add the new entrie
 
 	tableId++;
 	printf("tableId: %d\n", tableId);
@@ -416,7 +417,8 @@ int addTable(char cid, uint tid, short dataLength, char* dataStart) {
 	strcat(output[argCount], tab);
 	strcat(output[argCount], cmdtok[3]);
 	strcat(output[argCount], endLine);
-	printf("%s \n", output[argCount]);
+	printf("Hier %s \n", output[11]);
+	printf("Hi %s \n", output[argCount]);
 
 	newTableFile = fopen("/etc/iproute2/rt_tables", "w");
 
@@ -455,13 +457,14 @@ int addRule(char cid, uint tid, short dataLength, char* dataStart) {
 		tokcnt++;
 	}
 
-	char* args[32] = {"ip", "-6", "rule", "add", cmdtok[3], cmdtok[4], cmdtok[5], cmdtok[6] };
-	int i = 6;
+	printf("%s, %s\n", cmdtok[5], cmdtok[6]);
+	char* args[32] = {"ip", "-6", "rule", "add", cmdtok[3], cmdtok[4], cmdtok[5], cmdtok[6], '\0' };
+/*	int i = 6;
 	while (i < tokcnt) {
 		args[i] = cmdtok[i+1];
 		i++;
 	}
-	args[i] == '\0';
+	args[i] == '\0';*/
 	
 	success = executeArgs(args);
 	return success;
@@ -479,13 +482,13 @@ int removeRule(char cid, uint tid, short dataLength, char* dataStart) {
 		tokcnt++;
 	}
 
-	char* args[32] = {"ip", "-6", "rule", "del", cmdtok[3], cmdtok[4], cmdtok[5], cmdtok[6] };
-	int i = 6;
+	char* args[32] = {"ip", "-6", "rule", "del", cmdtok[3], cmdtok[4], cmdtok[5], cmdtok[6], '\0' };
+	/*int i = 6;
 	while (i < tokcnt) {
 		args[i] = cmdtok[i+1];
 		i++;
 	}
-	args[i] == '\0';
+	args[i] == '\0';*/
 	
 	success = executeArgs(args);
 	return success;

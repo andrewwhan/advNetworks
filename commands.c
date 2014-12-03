@@ -31,6 +31,7 @@ void sendMessage(char cid, char** cmdArgs){
 		msgLoc += strlen(cmdArgs[i]) + 1;
 		i++;
 	}
+	*(messagePtr + msgLoc - 1) = '\0';
 	// for(i=0; i<msgLoc; i++){
 	// 	printf("%02X \n", messagePtr[i]);
 	// }
@@ -178,8 +179,8 @@ void routeCommand( char** cmdArgs) {
 			else printf("Format error. Try using: route remove [HOSTNAME] [IP ADDRESS] [INTERFACE]\n");
 			break;
 		case 2:			// show 0x2, expected args count = 3
-			if(countArgs(cmdArgs) == 3) sendMessage(0x21, cmdArgs);
-			else printf("Format error. Try using: route show [HOSTNAME]\n");
+			if(countArgs(cmdArgs) == 4) sendMessage(0x21, cmdArgs);
+			else printf("Format error. Try using: route show [HOSTNAME] [TABLE NAME]\n");
 			break;
 		case -1:
 			printf("Invalid route command. Try using: add, show, remove\n");

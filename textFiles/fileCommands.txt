@@ -1,3 +1,0 @@
-alias show host2.team3.4516.cs.wpi.edu
-alias add host2.team3.4516.cs.wpi.edu 128::256 eth0:0
-alias show host2.team3.4516.cs.wpi.edu

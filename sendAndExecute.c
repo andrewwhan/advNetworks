@@ -133,7 +133,7 @@ void sendShow(char cid, uint tid, int socket) {
 	*(messagePtr + 7 + dataLength) = '\0';
 
 	sendMessageHost(socket, messagePtr, 7+dataLength);			// send message
-	free(messagePtr);
+	//free(messagePtr);
 	return;
 }
 

@@ -2,95 +2,157 @@ root@andrew-VirtualBox:/media/sf_cs4516# ./controller
 Socket set up 
 Host host1.team3.4516.cs.wpi.edu connected! 
 >> Host host2.team3.4516.cs.wpi.edu connected! 
-
->> alias show host1.team3.4516.cs.wpi.edu
->> successfully sent
-cid:		20
-tid:		1354
-dataLength:	1032
-eth0      Link encap:Ethernet  HWaddr 52:54:00:45:16:09  
-          inet addr:10.45.3.1  Bcast:10.255.255.255  Mask:255.0.0.0
-          inet6 addr: fe80::5054:ff:fe45:1609/64 Scope:Link
-          inet6 addr: 2607:f5c0:8010:c0de:4516:3:0:1/112 Scope:Global
-          inet6 addr: 15::1230/128 Scope:Global
-          UP BROADCAST RUNNING MULTICAST  MTU:1500  Metric:1
-          RX packets:505993 errors:0 dropped:0 overruns:0 frame:0
-          TX packets:177770 errors:0 dropped:0 overruns:0 carrier:0
-          collisions:0 txqueuelen:1000 
-          RX bytes:224281311 (224.2 MB)  TX bytes:17647595 (17.6 MB)
-
-lo        Link encap:Local Loopback  
-          inet addr:127.0.0.1  Mask:255.0.0.0
-          inet6 addr: ::1/128 Scope:Host
-          UP LOOPBACK RUNNING  MTU:65536  Metric:1
-          RX packets:101 errors:0 dropped:0 overruns:0 frame:0
-          TX packets:101 errors:0 dropped:0 overruns:0 carrier:0
-          collisions:0 txqueuelen:0 
-          RX bytes:11392 (11.3 KB)  TX bytes:11392 (11.3 KB)
-
-
-
->> alias add host1.team3.4516.cs.wpi.edu 128::256/112 eth0:0
->> successfully sent
-cid:		00
-tid:		1355
+>> Host host3.team3.4516.cs.wpi.edu connected! 
+>> Host host4.team3.4516.cs.wpi.edu connected! 
+All hosts connected! 
+>> table add host2.team3.4516.cs.wpi.edu shmork
+Successfully sent
+cid:		06
+tid:		1352
 dataLength:	40
 Success! specified command was executed 
-alias show host1.team3.4516.cs.wpi.edu
->> successfully sent
-cid:		20
-tid:		1356
-dataLength:	1081
-eth0      Link encap:Ethernet  HWaddr 52:54:00:45:16:09  
-          inet addr:10.45.3.1  Bcast:10.255.255.255  Mask:255.0.0.0
-          inet6 addr: 128::256/112 Scope:Global
-          inet6 addr: fe80::5054:ff:fe45:1609/64 Scope:Link
-          inet6 addr: 2607:f5c0:8010:c0de:4516:3:0:1/112 Scope:Global
-          inet6 addr: 15::1230/128 Scope:Global
-          UP BROADCAST RUNNING MULTICAST  MTU:1500  Metric:1
-          RX packets:506554 errors:0 dropped:0 overruns:0 frame:0
-          TX packets:177811 errors:0 dropped:0 overruns:0 carrier:0
-          collisions:0 txqueuelen:1000 
-          RX bytes:224362885 (224.3 MB)  TX bytes:17654671 (17.6 MB)
-
-lo        Link encap:Local Loopback  
-          inet addr:127.0.0.1  Mask:255.0.0.0
-          inet6 addr: ::1/128 Scope:Host
-          UP LOOPBACK RUNNING  MTU:65536  Metric:1
-          RX packets:101 errors:0 dropped:0 overruns:0 frame:0
-          TX packets:101 errors:0 dropped:0 overruns:0 carrier:0
-          collisions:0 txqueuelen:0 
-          RX bytes:11392 (11.3 KB)  TX bytes:11392 (11.3 KB)
-
-
-
->> alias remove host1.team3.4516.cs.wpi.edu 128::256/112 eth0:0
->> successfully sent
-cid:		10
+>> route add host2.team3.4516.cs.wpi.edu 2607:f5c0:8010:c0de:4516:3:0:4 via 2607:f5c0:8010:c0de:4516:3:0:3 dev eth0 table shmork
+Successfully sent
+cid:		01
+tid:		1353
+dataLength:	40
+Success! specified command was executed 
+>> route show host2.team3.4516.cs.wpi.edu shmork
+Successfully sent
+cid:		21
 tid:		1357
+dataLength:	90
+2607:f5c0:8010:c0de:4516:3:0:4 via 2607:f5c0:8010:c0de:4516:3:0:3 dev eth0  metric 1024 
+>> rule add host2.team3.4516.cs.wpi.edu to 2607:f5c0:8010:c0de:4516:3:0:4 table shmork
+Successfully sent
+cid:		07
+tid:		1359
 dataLength:	40
 Success! specified command was executed 
-alias show host1.team3.4516.cs.wpi.edu            
->> successfully sent
-cid:		20
-tid:		1358
-dataLength:	1032
-e h0      Link encap:Ethernet  HWaddr 52:54:00:45:16:09  
-          inet addr:10.45.3.1  Bcast:10.255.255.255  Mask:255.0.0.0
-          inet6 addr: fe80::5054:ff:fe45:1609/64 Scope:Link
-          inet6 addr: 2607:f5c0:8010:c0de:4516:3:0:1/112 Scope:Global
-          inet6 addr: 15::1230/128 Scope:Global
-          UP BROADCAST RUNNING MULTICAST  MTU:1500  Metric:1
-          RX packets:506990 errors:0 dropped:0 overruns:0 frame:0
-          TX packets:177839 errors:0 dropped:0 overruns:0 carrier:0
-          collisions:0 txqueuelen:1000 
-          RX bytes:224448353 (224.4 MB)  TX bytes:17660824 (17.6 MB)
+>> rule show host2.team3.4516.cs.wpi.edu
+Successfully sent
+cid:		27
+tid:		1360
+dataLength:	123
+0:	from all lookup local 
+16383:	from all to 2607:f5c0:8010:c0de:4516:3:0:4 lookup shmork 
+32766:	from all lookup main 
+>> rule remove host2.team3.4516.cs.wpi.edu to 2607:f5c0:8010:c0de:4516:3:0:4 table shmork
+Successfully sent
+cid:		17
+tid:		1362
+dataLength:	40
+Success! specified command was executed 
+>> rule show host2.team3.4516.cs.wpi.edu
+Successfully sent
+cid:		27
+tid:		1363
+dataLength:	57
+0:	from all lookup local 
+32766:	from all lookup main 
+>> route remove host2.team3.4516.cs.wpi.edu 2607:f5c0:8010:c0de:4516:3:0:4 via 2607:f5c0:8010:c0de:4516:3:0:3 dev eth0 table shmork
+Successfully sent
+cid:		11
+tid:		1365
+dataLength:	40
+Success! specified command was executed 
+>> route show host2.team3.4516.cs.wpi.edu shmork 
+Successfully sent
+cid:		21
+tid:		1366
+dataLength:	0
+>> table remove host2.team3.4516.cs.wpi.edu shmork
+Successfully sent
+cid:		16
+tid:		1367
+dataLength:	40
+Success! specified command was executed 
+>> neigh show host3.team3.4516.cs.wpi.edu
+Successfully sent
+cid:		28
+tid:		1368
+dataLength:	1160
+fe80::5054:ff:fe45:1639 dev eth0 lladdr 52:54:00:45:16:39 STALE
+fe80::5054:ff:fe45:163a dev eth0 lladdr 52:54:00:45:16:3a STALE
+`fe80::5054:ff:fe45:163b dev eth0 lladdr 52:54:00:45:16:3b STALE
+fe80::5054:ff:fe45:160c dev eth0 lladdr 52:54:00:45:16:0c STALE
+2607:f5c0:8010:c0de:4516:3:0:257 dev eth0 lladdr 52:54:00:45:16:09 STALE
+fe80::5054:ff:fe45:163c dev eth0 lladdr 52:54:00:45:16:3c STALE
+fe80::a56e:459e:22c7:8427 dev eth0 lladdr 00:90:f5:d3:de:2c STALE
+fe80::9929:d9f5:4314:6c27 dev eth0 lladdr f0:de:f1:ed:00:5d STALE
+2607:f5c0:8010:c0de:4516:3:0:1 dev eth0 lladdr 52:54:00:45:16:09 STALE
+2607:f5c0:8010:c0de:4516:3:0:2 dev eth0 lladdr 52:54:00:45:16:0a STALE
+2607:f5c0:8010:c0de:4516:3:0:4 dev eth0 lladdr 52:54:00:45:16:0c STALE
+fe80::a00:27ff:fed9:f401 dev eth0 lladdr 08:00:27:d9:f4:01 router STALE
+fe80::5054:ff:fe45:1609 dev eth0 lladdr 52:54:00:45:16:09 STALE
+fe80::5054:ff:fe45:160a dev eth0 lladdr 52:54:00:45:16:0a STALE
+10.45.3.2 dev eth0 lladdr 52:54:00:45:16:0a STALE
+10.45.3.4 dev eth0 lladdr 52:54:00:45:16:0c STALE
+10.10.0.2 dev eth0 lladdr 52:54:00:b1:a3:f0 REACHABLE
+10.45.3.1 dev eth0 lladdr 52:54:00:45:16:09 STALE
 
- l         Link encap:Local Loopback  
-          inet addr:127.0.0.1  Mask:255.0.0.0
-          inet6 addr: ::1/128 Scope:Host
-          UP LOOPBACK RUNNING  MTU:65536  Metric:1
-          RX packets:101 errors:0 dropped:0 overruns:0 frame:0
-          TX packets:101 errors:0 dropped:0 overruns:0 carrier:0
-          collisions:0 txqueuelen:0 
-          RX bytes:11392 (11.3 KB)  TX bytes:11392 (11.3 KB)
+>> neigh add host3.team3.4516.cs.wpi.edu 56::14 a3:23:45:f1:12:01 
+Successfully sent
+cid:		08
+tid:		1369
+dataLength:	40
+Success! specified command was executed 
+>> neigh show host3.team3.4516.cs.wpi.edu
+Successfully sent
+cid:		28
+tid:		1370
+dataLength:	1354
+56::14 dev eth0 lladdr a3:23:45:f1:12:01 PERMANENT
+fe80::5054:ff:fe45:1639 dev eth0 lladdr 52:54:00:45:16:39 STALE
+fe80::5054:ff:fe45:163a dev eth0 lladdr 52:54:00:45:16:3a STALE
+fe80::5054:ff:fe45:163b dev eth0 lladdr 52:54:00:45:16:3b STALE
+fe80::5054:ff:fe45:160c dev eth0 lladdr 52:54:00:45:16:0c STALE
+2607:f5c0:8010:c0de:4516:3:0:257 dev eth0 lladdr 52:54:00:45:16:09 STALE
+fe80::5054:ff:fe45:163c dev eth0 lladdr 52:54:00:45:16:3c STALE
+fe80::a56e:459e:22c7:8427 dev eth0 lladdr 00:90:f5:d3:de:2c STALE
+fe80::9929:d9f5:4314:6c27 dev eth0 lladdr f0:de:f1:ed:00:5d STALE
+2607:f5c0:8010:c0de:4516:3:0:1 dev eth0 lladdr 52:54:00:45:16:09 STALE
+2607:f5c0:8010:c0de:4516:3:0:2 dev eth0 lladdr 52:54:00:45:16:0a STALE
+2607:f5c0:8010:c0de:4516:3:0:4 dev eth0 lladdr 52:54:00:45:16:0c STALE
+2607:f5c0:8010:c0de:4516:3:0:5 dev eth0 lladdr 08:00:27:d9:f4:01 router REACHABLE
+fe80::a00:27ff:fed9:f401 dev eth0 lladdr 08:00:27:d9:f4:01 router REACHABLE
+fe80::5054:ff:fe45:1609 dev eth0 lladdr 52:54:00:45:16:09 STALE
+fe80::5054:ff:fe45:160a dev eth0 lladdr 52:54:00:45:16:0a STALE
+10.45.3.2 dev eth0 lladdr 52:54:00:45:16:0a STALE
+10.45.3.4 dev eth0 lladdr 52:54:00:45:16:0c STALE
+10.45.3.5 dev eth0 lladdr 08:00:27:d9:f4:01 REACHABLE
+10.10.0.2 dev eth0 lladdr 52:54:00:b1:a3:f0 REACHABLE
+10.45.3.1 dev eth0 lladdr 52:54:00:45:16:09 STALE
+
+>> neigh remove host3.team3.4516.cs.wpi.edu 56::14 a3:23:45:f1:12:01
+Successfully sent
+cid:		18
+tid:		1371
+dataLength:	40
+Success! specified command was executed 
+>> neigh show host3.team3.4516.cs.wpi.edu
+Successfully sent
+cid:		28
+tid:		1372
+dataLength:	1298
+fe80::5054:ff:fe45:1639 dev eth0 lladdr 52:54:00:45:16:39 STALE
+fe80::5054:ff:fe45:163a dev eth0 lladdr 52:54:00:45:16:3a STALE
+ fe80::5054:ff:fe45:163b dev eth0 lladdr 52:54:00:45:16:3b STALE
+fe80::5054:ff:fe45:160c dev eth0 lladdr 52:54:00:45:16:0c STALE
+2607:f5c0:8010:c0de:4516:3:0:257 dev eth0 lladdr 52:54:00:45:16:09 STALE
+fe80::5054:ff:fe45:163c dev eth0 lladdr 52:54:00:45:16:3c STALE
+fe80::a56e:459e:22c7:8427 dev eth0 lladdr 00:90:f5:d3:de:2c STALE
+fe80::9929:d9f5:4314:6c27 dev eth0 lladdr f0:de:f1:ed:00:5d STALE
+2607:f5c0:8010:c0de:4516:3:0:1 dev eth0 lladdr 52:54:00:45:16:09 STALE
+2607:f5c0:8010:c0de:4516:3:0:2 dev eth0 lladdr 52:54:00:45:16:0a STALE
+2607:f5c0:8010:c0de:4516:3:0:4 dev eth0 lladdr 52:54:00:45:16:0c STALE
+2607:f5c0:8010:c0de:4516:3:0:5 dev eth0 lladdr 08:00:27:d9:f4:01 router REACHABLE
+fe80::a00:27ff:fed9:f401 dev eth0 lladdr 08:00:27:d9:f4:01 router STALE
+fe80::5054:ff:fe45:1609 dev eth0 lladdr 52:54:00:45:16:09 STALE
+fe80::5054:ff:fe45:160a dev eth0 lladdr 52:54:00:45:16:0a STALE
+10.45.3.2 dev eth0 lladdr 52:54:00:45:16:0a STALE
+10.45.3.4 dev eth0 lladdr 52:54:00:45:16:0c STALE
+10.45.3.5 dev eth0 lladdr 08:00:27:d9:f4:01 REACHABLE
+10.10.0.2 dev eth0 lladdr 52:54:00:b1:a3:f0 REACHABLE
+10.45.3.1 dev eth0 lladdr 52:54:00:45:16:09 STALE
+

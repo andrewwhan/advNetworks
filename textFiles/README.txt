@@ -42,3 +42,8 @@ Sends a response to the controller
 
 
 Each .c file comes with a corresponding .h file with function protoypes and includes.
+
+IPv6 Modifications:
+Enabling IPv6 just required that we change the ai_family of the hints struct addrinfo to AF_INET6 from AF_INET in both the controller code where we listen for the agents and in the agent code where we attempt to connect to the controller. With these two lines changed, our code was communicating over IPv6.
+
+wireshark ipv6.txt contains an example packet from wireshark, where the controller requests the aliases of host2. The source and destination IPs show that our code is running on IPv6 

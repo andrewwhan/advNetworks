@@ -8,3 +8,4 @@
 
 int controllerConnect();
 void waitForCommands(int socket);
+void waitForPackets();

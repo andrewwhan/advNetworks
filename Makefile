@@ -6,11 +6,14 @@ controller: controller.c controller.h commands
 commands: commands.c commands.h
 	gcc -c commands.c
 
-agent: agent.c agent.h hostCommands
-	gcc agent.c hostCommands.o sendAndExecute.o -o agent
+agent: agent.c agent.h hostCommands hostPacket
+	gcc agent.c hostCommands.o sendAndExecute.o hostPacket.o -o agent
 
 hostCommands: hostCommands.c hostCommands.h sendAndExecute
 	gcc -c hostCommands.c
+	
+hostPacket: hostPacket.c hostPacket.h
+	gcc -c hostPacket.c
 
 sendAndExecute: sendAndExecute.c sendAndExecute.h
 	gcc -c sendAndExecute.c

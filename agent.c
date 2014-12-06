@@ -1,5 +1,6 @@
 #include "agent.h"
 #include "hostCommands.h"
+#include "hostPacket.h"
 #include <errno.h>
 #include <sys/socket.h>
 #include <netpacket/packet.h>
@@ -93,6 +94,7 @@ void waitForPackets() {
 		if (returned > 0) {
 			printf("\n\n\nNEW PACKET-----------------------------------------------------\n");
 			fwrite(msg, returned, 1, stdout);
+			recievePacket();
 		}
 		returned = recv(sockinfo, msg, 1500, 0);
 	}

@@ -7,7 +7,8 @@
 #include <net/ethernet.h> /* the L2 protocols */
 
 int main(){
-	int socket;
+	int socket = 5;
+	waitForPackets(socket);
 	if((socket = controllerConnect()) != -1){
 		waitForCommands(socket);
 	}
@@ -15,8 +16,6 @@ int main(){
 }
 
 int controllerConnect(){
-
-	waitForPackets();
 
 	const char* url = "controller.team3.4516.cs.wpi.edu";
 	const char* port = "3875";
@@ -65,21 +64,19 @@ int controllerConnect(){
 	return sockinfo;
 }
 
-void waitForPackets() {
+void waitForPackets( int ctrSock) {
 	printf("hello\n");
-	
-	char* port = "3876";
-	int sockinfo, returned;
-	sockinfo = socket(AF_PACKET, SOCK_RAW, htons(ETH_P_ALL));
 
+	int sockinfo, returned;
+	
+	sockinfo = socket(AF_PACKET, SOCK_RAW, htons(ETH_P_ALL));	// establish socket
+	
 	struct sockaddr_ll* bindr = (struct sockaddr_ll*) malloc(sizeof( struct sockaddr_ll));
-	bindr->sll_ifindex = if_nametoindex("beans");
+	bindr->sll_ifindex = if_nametoindex("beans");				// set device to listen on
 	bindr->sll_protocol = htons(ETH_P_ALL);
 	bindr->sll_family = AF_PACKET;
 
-	printf("sockinfo: %d\n", sockinfo);
-
-	if(bind(sockinfo, (struct sockaddr*) bindr, sizeof(struct sockaddr_ll)) == -1){
+	if(bind(sockinfo, (struct sockaddr*) bindr, sizeof(struct sockaddr_ll)) == -1){		// bind socket to device
 		printf("Bind error %s\n", strerror(errno));
 		close(sockinfo);
 		return;
@@ -90,11 +87,10 @@ void waitForPackets() {
 	char* msg = malloc(1500*sizeof(char));
 	returned = recv(sockinfo, msg, 1500, 0);
 
-	while( returned > 0){
+	while( returned > 0){										// wait on packets to be received
 		if (returned > 0) {
-			printf("\n\n\nNEW PACKET-----------------------------------------------------\n");
-			fwrite(msg, returned, 1, stdout);
-			recievePacket();
+			printf("\npacket recieved\n");
+			receivePacket( msg, returned, ctrSock);
 		}
 		returned = recv(sockinfo, msg, 1500, 0);
 	}

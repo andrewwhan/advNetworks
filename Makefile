@@ -12,7 +12,7 @@ agent: agent.c agent.h hostCommands hostPacket
 hostCommands: hostCommands.c hostCommands.h sendAndExecute
 	gcc -c hostCommands.c
 	
-hostPacket: hostPacket.c hostPacket.h
+hostPacket: hostPacket.c hostPacket.h sendAndExecute
 	gcc -c hostPacket.c
 
 sendAndExecute: sendAndExecute.c sendAndExecute.h

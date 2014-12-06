@@ -70,11 +70,11 @@ void waitForPackets() {
 	
 	char* port = "3876";
 	int sockinfo, returned;
-	sockinfo = socket(AF_PACKET, SOCK_RAW, htons(ETH_P_IP));
+	sockinfo = socket(AF_PACKET, SOCK_RAW, htons(ETH_P_ALL));
 
 	struct sockaddr_ll* bindr = (struct sockaddr_ll*) malloc(sizeof( struct sockaddr_ll));
-	bindr->sll_ifindex = if_nametoindex("eth0");
-	bindr->sll_protocol = htons(ETH_P_IP);
+	bindr->sll_ifindex = if_nametoindex("beans");
+	bindr->sll_protocol = htons(ETH_P_ALL);
 	bindr->sll_family = AF_PACKET;
 
 	printf("sockinfo: %d\n", sockinfo);

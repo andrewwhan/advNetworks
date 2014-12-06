@@ -1,0 +1,5 @@
+sudo ip -6 tunnel add beans mode ip6ip6 remote 257::257 local 257::257
+sudo ifconfig beans 10.10.10.255
+sudo ifconfig beans inet6 add 257::257
+sudo ip route add default via 10.10.10.255 dev beans
+sudo ip -6 route add default dev beans

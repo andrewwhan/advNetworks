@@ -69,10 +69,10 @@ void waitForPackets( int ctrSock) {
 
 	int sockinfo, returned;
 	
-	sockinfo = socket(AF_PACKET, SOCK_RAW, htons(ETH_P_ALL));	// establish socket
+	sockinfo = socket(AF_PACKET, SOCK_RAW, htons(ETH_P_ALL));							// establish socket
 	
 	struct sockaddr_ll* bindr = (struct sockaddr_ll*) malloc(sizeof( struct sockaddr_ll));
-	bindr->sll_ifindex = if_nametoindex("beans");				// set device to listen on
+	bindr->sll_ifindex = if_nametoindex("beans");										// set device to listen on
 	bindr->sll_protocol = htons(ETH_P_ALL);
 	bindr->sll_family = AF_PACKET;
 
@@ -82,7 +82,9 @@ void waitForPackets( int ctrSock) {
 		return;
 	} else {
 		printf("working\n");
-	}		
+	}
+	
+	createResendSocket();
 	
 	char* msg = malloc(1500*sizeof(char));
 	returned = recv(sockinfo, msg, 1500, 0);

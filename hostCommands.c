@@ -4,6 +4,7 @@
 #include <sys/types.h>
 #include <string.h>
 #include "hostCommands.h"
+#include "hostPacket.h"
 
 #define HEADER 7
 
@@ -21,7 +22,7 @@ void receiveCommand(char* messagePtr, int socket) {
 
 	int status;
 
-	switch(cid){
+	switch((unsigned char) cid){
 		case 0x00:
 			// Add alias command
 			status = addIPv6Alias(cid, tid, dataLength, dataStart);
@@ -123,6 +124,14 @@ void receiveCommand(char* messagePtr, int socket) {
 			if(status){
 				status = 3;	// indicate that it is a show command that executed correctly
 			}
+			break;
+		case 0x81:
+			// Resend Packet
+			status = resendPacket(cid, tid, dataLength, dataStart);
+			break;
+		case 0x82:
+			// Drop Packet
+			status = dropPacket(cid, tid, dataLength, dataStart);
 			break;
 		case 0x0A:
 			// Exit command
@@ -502,6 +511,16 @@ int showRule(char cid, uint tid, short dataLength, char* dataStart) {
 	int success = executeShow(args);
 
 	return success;
+}
+
+int resendPacket(char cid, uint tid, short dataLength, char* dataStart){
+	char** args = { '\0' };
+	return !resendElevatedPacket( tid, args);
+}
+
+int dropPacket(char cid, uint tid, short dataLength, char* dataStart) {
+
+	return !dropElevatedPacket( tid);
 }
 
 void cleanExit(int socket, char* messagePtr){

@@ -19,4 +19,6 @@ int removeRule(char cid, uint tid, short dataLength, char* dataStart);
 int showRule(char cid, uint tid, short dataLength, char* dataStart);
 int addTable(char cid, uint tid, short dataLength, char* dataStart);
 int removeTable(char cid, uint tid, short dataLength, char* dataStart);
+int resendPacket(char cid, uint tid, short dataLength, char* dataStart);
+int dropPacket(char cid, uint tid, short dataLength, char* dataStart);
 void cleanExit(int socket, char* messagePtr);

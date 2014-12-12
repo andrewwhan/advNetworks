@@ -69,7 +69,7 @@ void waitForPackets( int ctrSock) {
 
 	int sockinfo, returned;
 	
-	sockinfo = socket(AF_PACKET, SOCK_RAW, htons(ETH_P_ALL));							// establish socket
+	sockinfo = socket(AF_PACKET, SOCK_DGRAM, htons(ETH_P_ALL));							// establish socket
 	
 	struct sockaddr_ll* bindr = (struct sockaddr_ll*) malloc(sizeof( struct sockaddr_ll));
 	bindr->sll_ifindex = if_nametoindex("beans");										// set device to listen on

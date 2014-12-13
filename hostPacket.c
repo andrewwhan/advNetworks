@@ -24,7 +24,6 @@ void createResendSocket() {
 }
 
 void receivePacket(char* msg, int returned, int ctrSock) {
-	fwrite(msg, returned, 1, stdout);
 
 	short dataLength = 1207;
 	uint tid = nextTid;
@@ -37,8 +36,6 @@ void receivePacket(char* msg, int returned, int ctrSock) {
 		dataLength = returned+7;
 	}
 	
-	printf("\ndataLength:	%hd\n", dataLength);
-	
 	int msgLoc = 0;
 	char* elevateMsg = malloc(sizeof(char) * (HEADER + dataLength));
 	memcpy(elevateMsg + msgLoc, &cid, 1);
@@ -48,11 +45,15 @@ void receivePacket(char* msg, int returned, int ctrSock) {
 	memcpy(elevateMsg + msgLoc, &dataLength, sizeof(short));
 	msgLoc += 2;
 	int printable = dataLength;
-	printf("sending message %d\n", printable);
 	memcpy(elevateMsg + msgLoc, msg, printable-7);
-	fwrite(elevateMsg, printable, 1, stdout);
+	//fwrite(elevateMsg, printable, 1, stdout);
 
-	sendMessageHost(ctrSock, elevateMsg, dataLength);
+	//sendMessageHost(ctrSock, elevateMsg, dataLength);
+	
+	if(send(ctrSock, elevateMsg, dataLength, 0) == -1){
+		printf("Send error \n");
+		//close(socket);
+	}
 	
 	list = addPacket( list, msg, returned, tid);
 	printPackets(list);

@@ -1,21 +1,17 @@
 #include "controller.h"
 #include "commands.h"
+#include "elevator.h"
 #include <errno.h>
 
 uint nextTid = 1351;
 struct hostInfo* firstHost;
-
-struct hostInfo{
-	char hostName[32];
-	char secret[16];
-	int socket;
-	struct hostInfo* next;
-};
+struct elevConfig* elevData;
 
 int main( int argc, char* argv[]){
 	firstHost = loadDatabase();	//Read database file for host information
+	elevData = loadElev(); //Read elevation database file
 	//printf("First %s followed by %s \n", hosts->hostName, hosts->next->hostName);
-	listenForHosts();					// listen to establish connections to hosts
+	//listenForHosts();					// listen to establish connections to hosts
 	controllerCommandTerminal();				// start command line for user input
 }
 
@@ -47,6 +43,59 @@ struct hostInfo* loadDatabase(){
 		}
 	}
 	return firstHost;
+}
+
+struct elevConfig* loadElev(){
+	FILE* elevFile;
+	elevFile = fopen("elevConfig.txt", "r");
+	int end = 0;
+	struct elevConfig* firstRule = NULL;
+	struct elevConfig* prevRule = NULL;
+
+	while(end != EOF){
+		char hostName[32];
+		char sourceAddr[40];
+		char destAddr[40];
+		char* action[10];
+
+		fscanf(elevFile, "%s", hostName);
+		if(fscanf(elevFile, " source=%[^,],", sourceAddr) == 0){
+			sourceAddr[0] = '*';
+			sourceAddr[1] = '\0';
+		}
+		if(fscanf(elevFile, " dest=%[^,],", destAddr) == 0){
+			destAddr[0] = '*';
+			destAddr[1] = '\0';
+		}
+		end = fscanf(elevFile, " action=(%m[^)]),", action);
+		if(end != EOF){
+			struct elevConfig* rule = malloc(sizeof(struct elevConfig));
+			if(firstRule == NULL){
+				firstRule = rule;
+				prevRule = rule;
+			}
+			else{
+				prevRule->next = rule;
+				prevRule = rule;
+			}
+			const char* delimiter = ";";
+			int tokcnt = 1;
+			rule->action[0] = strtok( action[0], delimiter);			// tokenize command
+			while( rule->action[tokcnt-1]){
+				rule->action[tokcnt] = strtok( NULL, delimiter);
+				tokcnt++;
+			}
+			memcpy(rule->hostName, hostName, 32);
+			memcpy(rule->sourceAddr, sourceAddr, 40);
+			memcpy(rule->destAddr, destAddr, 40);
+			printf("%s %s %s %s \n", hostName, sourceAddr, destAddr, action[0]);
+		}
+		else{
+			prevRule->next = NULL;
+		}
+
+	}
+	return firstRule;
 }
 
 void listenForHosts(){
@@ -85,15 +134,15 @@ void listenForHosts(){
 		FD_SET(listenSocket, &inputs); //listen socket
 		numfds = listenSocket;
 		struct hostInfo* currentHost = firstHost;
-		// while(currentHost != NULL){
-		// 	if(currentHost->socket != 0){
-		// 		FD_SET(currentHost->socket, &inputs);
-		// 		if(currentHost->socket > numfds){
-		// 			numfds = currentHost->socket;
-		// 		}
-		// 	}
-		// 	currentHost = currentHost->next;
-		// }
+		while(currentHost != NULL){
+			if(currentHost->socket != 0){
+				FD_SET(currentHost->socket, &inputs);
+				if(currentHost->socket > numfds){
+					numfds = currentHost->socket;
+				}
+			}
+			currentHost = currentHost->next;
+		}
 		select(numfds+1, &inputs, NULL, NULL, NULL);
 		if(FD_ISSET(0, &inputs)){
 			char cmdline[514];
@@ -154,14 +203,21 @@ void listenForHosts(){
 					close(commSocket);
 				}
 			}
-			free(msg);		}
+			free(msg);
+		}
+		while(currentHost != NULL){
+			if(currentHost->socket != 0){
+				if(FD_ISSET(currentHost->socket, &inputs)){
+					elevate(currentHost->socket);
+				}
+			}
+			currentHost = currentHost->next;
+		}
 	}
 	printf("All hosts connected! \n");
 	close(listenSocket);
 	return;
 }
-
-
 
 void controllerCommandTerminal() {
 	char cmdline [514];
@@ -212,6 +268,13 @@ void parseCommandLine(char* cmdline){
 					currentHost = currentHost->next;
 					free(firstHost);
 					firstHost = currentHost;
+				}
+				struct elevConfig* currentRule = elevData;
+				while(currentRule != NULL){
+					currentRule = currentRule->next;
+					free(elevData->action[0]);
+					free(elevData);
+					elevData = currentRule;
 				}
 				exit(0);
 			}
@@ -296,6 +359,17 @@ int getSocketByName(char* hostName){
 		currentHost = currentHost->next;
 	}
 	return -1;
+}
+
+char* getNameBySocket(int sockinfo){
+	struct hostInfo* currentHost = firstHost;
+	while(currentHost != NULL){
+		if(sockinfo == currentHost->socket){
+			return currentHost->hostName;
+		}
+		currentHost = currentHost->next;
+	}
+	return NULL;
 }
 
 void runFile(char** cmdArgs){

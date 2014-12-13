@@ -1,11 +1,14 @@
 all: controller agent
 
-controller: controller.c controller.h commands
-	gcc controller.c commands.o -o controller
+controller: controller.c controller.h commands elevator
+	gcc controller.c commands.o elevator.o -o controller
 
 commands: commands.c commands.h
 	gcc -c commands.c
 
+elevator: elevator.c elevator.h
+	gcc -c elevator.c
+	
 agent: agent.c agent.h hostCommands hostPacket
 	gcc agent.c hostCommands.o sendAndExecute.o hostPacket.o list.o -o agent
 

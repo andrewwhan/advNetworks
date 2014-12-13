@@ -65,6 +65,7 @@ char* constructHeader( char cid, uint tid, short dataLength) {
 	msgLoc += 4;
 	memcpy(messagePtr + msgLoc, &dataLength, sizeof(short));
 	msgLoc += 2;
+	printf("cid: %c\n", *messagePtr);
 	return messagePtr;
 }
 

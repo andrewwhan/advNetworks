@@ -9,7 +9,7 @@
 void printPackets( packetEntry* list) {
 
 	if( list != NULL){
-		printf("\npacket tid: %d\n", list->tid);
+		printf("\npacket\ntid: %d\nlength: %d\n", list->tid, list->length);
 		fwrite(list->packet, list->length, 1, stdout);
 		printPackets( list->next);
 	}

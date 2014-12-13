@@ -52,11 +52,10 @@ void receivePacket(char* msg, int returned, int ctrSock) {
 	
 	if(send(ctrSock, elevateMsg, dataLength, 0) == -1){
 		printf("Send error \n");
-		//close(socket);
+	} else {
+		list = addPacket( list, msg, returned, tid);
+		printPackets(list);
 	}
-	
-	list = addPacket( list, msg, returned, tid);
-	printPackets(list);
 
 	nextTid++;
 	return;

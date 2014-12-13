@@ -19,7 +19,7 @@ int resendSocket;
 
 void createResendSocket() {
 
-	resendSocket = socket(AF_INET6, SOCK_RAW, IPPROTO_IPV6);
+	resendSocket = socket(AF_INET6, SOCK_DGRAM, IPPROTO_IPV6);
 	return;
 }
 
@@ -64,8 +64,11 @@ void receivePacket(char* msg, int returned, int ctrSock) {
 int resendElevatedPacket( int tid, char** args){
 	packetEntry* resendPacket = getPacket(list, tid);
 	if( resendPacket != NULL) {
-	 	struct sockaddr* bunz;
-		sendto(resendSocket, resendPacket->packet, resendPacket->length, 0, bunz, sizeof(struct sockaddr*));
+		struct sockaddr_ll* dest = malloc(sizeof(struct sockaddr_ll));		// destination address
+		dest->sll_family = AF_PACKET;
+		dest->sll_protocol = htons(ETH_P_ALL);
+		dest->sll_ifindex = if_nametoindex("eth0");
+		sendto(resendSocket, resendPacket->packet, resendPacket->length, 0, (struct sockaddr*) &dest, sizeof(dest));
 		return 0;
 	}
 	return 1;

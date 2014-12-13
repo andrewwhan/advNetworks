@@ -7,10 +7,12 @@
 #include <net/ethernet.h> /* the L2 protocols */
 
 int main(){
-	int socket = 5;
-	waitForPackets(socket);
-	if((socket = controllerConnect()) != -1){
-		waitForCommands(socket);
+	int ctrlSocket, packetSocket;
+	createResendSocket();
+	packetSocket = esablishPacketSocket();
+	ctrlSocket = controllerConnect();
+	if(ctrlSocket != -1 && packetSocket != -1){
+		listenForAciton( ctrlSocket, packetSocket);
 	}
 	return;
 }
@@ -55,6 +57,7 @@ int controllerConnect(){
 	fscanf(dbFile, "%s %s", hostName, secret);
 	snprintf(msg + 7, sizeof(msg)-7, "%s %s", hostName, secret);
 	*(msg + 8 + strlen(hostName) + strlen(secret)) = '\0';
+	
 	if(send(sockinfo, msg, 9 + strlen(hostName) + strlen(secret), 0) == -1){
 		printf("Send error \n");
 		close(sockinfo);
@@ -64,52 +67,55 @@ int controllerConnect(){
 	return sockinfo;
 }
 
-void waitForPackets( int ctrSock) {
-	printf("hello\n");
-
-	int sockinfo, returned;
+int esablishPacketSocket() {
+	int sockinfo;
+	sockinfo = socket(AF_PACKET, SOCK_DGRAM, htons(ETH_P_ALL));								// establish socket
 	
-	sockinfo = socket(AF_PACKET, SOCK_DGRAM, htons(ETH_P_ALL));							// establish socket
-	
-	struct sockaddr_ll* bindr = (struct sockaddr_ll*) malloc(sizeof( struct sockaddr_ll));
-	bindr->sll_ifindex = if_nametoindex("beans");										// set device to listen on
-	bindr->sll_protocol = htons(ETH_P_ALL);
-	bindr->sll_family = AF_PACKET;
+	struct sockaddr_ll* resendAddr = (struct sockaddr_ll*) malloc(sizeof( struct sockaddr_ll));
+	resendAddr->sll_family = AF_PACKET;
+	resendAddr->sll_ifindex = if_nametoindex("eth0");										// set device to listen on
+	resendAddr->sll_protocol = htons(ETH_P_ALL);
 
-	if(bind(sockinfo, (struct sockaddr*) bindr, sizeof(struct sockaddr_ll)) == -1){		// bind socket to device
+	if(bind(sockinfo, (struct sockaddr*) resendAddr, sizeof(struct sockaddr_ll)) == -1){	// bind socket to device
 		printf("Bind error %s\n", strerror(errno));
 		close(sockinfo);
-		return;
+		free(resendAddr);
+		return -1;
 	} else {
 		printf("working\n");
+		free(resendAddr);
+		return sockinfo;
 	}
-	
-	createResendSocket();
-	
-	char* msg = malloc(1500*sizeof(char));
-	returned = recv(sockinfo, msg, 1500, 0);
-
-	while( returned > 0){										// wait on packets to be received
-		if (returned > 0) {
-			printf("\npacket recieved\n");
-			receivePacket( msg, returned, ctrSock);
-		}
-		returned = recv(sockinfo, msg, 1500, 0);
-	}
-	free(msg);
-	free(bindr);
-	printf("weMadeIt\n");
 }
 
-
-void waitForCommands(int socket) {
-	int returned = 1;
-	while (returned > 0) {
-		char* msg = malloc(1500*sizeof(char));
-		returned = recv(socket, msg, 1500, 0);
-		if (returned > 0) {
-			printf("command recieved");
-			receiveCommand(msg, socket);
+void listenForAciton( int ctrlSocket, int packetSocket) {
+	fd_set inputs;
+	int numfds;
+	FD_ZERO(&inputs);
+	FD_SET(ctrlSocket, &inputs); //stdin
+	FD_SET(packetSocket, &inputs); //listen socket
+	if( ctrlSocket > packetSocket) numfds = ctrlSocket;
+	else numfds = packetSocket;
+	int returned;
+	
+	while(1) {
+		select(numfds+1, &inputs, NULL, NULL, NULL);
+		if( FD_ISSET( ctrlSocket, &inputs)){
+			char* msg = malloc(1500*sizeof(char));
+			returned = recv(ctrlSocket, msg, 1500, 0);
+			if (returned > 0) {
+				printf("command recieved");
+				receiveCommand(msg, ctrlSocket);
+			}
+		}
+		if( FD_ISSET( packetSocket, &inputs)){
+			char* msg = malloc(1500*sizeof(char));
+			returned = recv(packetSocket, msg, 1500, 0);
+			if (returned > 0) {
+				printf("\npacket recieved\n");
+				receivePacket( msg, returned, ctrlSocket);
+			}
+			free(msg);
 		}
 	}
 	return;

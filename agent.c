@@ -73,7 +73,7 @@ int esablishPacketSocket() {
 	
 	struct sockaddr_ll* resendAddr = (struct sockaddr_ll*) malloc(sizeof( struct sockaddr_ll));
 	resendAddr->sll_family = AF_PACKET;
-	resendAddr->sll_ifindex = if_nametoindex("eth0");										// set device to listen on
+	resendAddr->sll_ifindex = if_nametoindex("beans");										// set device to listen on
 	resendAddr->sll_protocol = htons(ETH_P_ALL);
 
 	if(bind(sockinfo, (struct sockaddr*) resendAddr, sizeof(struct sockaddr_ll)) == -1){	// bind socket to device

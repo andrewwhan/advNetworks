@@ -11,7 +11,7 @@ int main( int argc, char* argv[]){
 	firstHost = loadDatabase();	//Read database file for host information
 	elevData = loadElev(); //Read elevation database file
 	//printf("First %s followed by %s \n", hosts->hostName, hosts->next->hostName);
-	//listenForHosts();					// listen to establish connections to hosts
+	listenForHosts();					// listen to establish connections to hosts
 	controllerCommandTerminal();				// start command line for user input
 }
 
@@ -42,6 +42,7 @@ struct hostInfo* loadDatabase(){
 			prevHost->next = NULL;
 		}
 	}
+	fclose(dbFile);
 	return firstHost;
 }
 
@@ -95,6 +96,7 @@ struct elevConfig* loadElev(){
 		}
 
 	}
+	fclose(elevFile);
 	return firstRule;
 }
 

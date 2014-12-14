@@ -76,6 +76,6 @@ int resendElevatedPacket( int tid, char** args){
 }
 
 int dropElevatedPacket( int tid){
-	remPacket( list, tid);
+	list = remPacket( list, tid);
 	return 0;
 }

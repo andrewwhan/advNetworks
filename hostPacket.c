@@ -10,6 +10,7 @@
 #include "hostPacket.h"
 #include "sendAndExecute.h"
 #include "list.h"
+#include <errno.h>
 
 #define HEADER 7
 
@@ -18,13 +19,14 @@ packetEntry* list = NULL;
 int resendSocket;
 
 void createResendSocket() {
-
-	resendSocket = socket(AF_INET6, SOCK_DGRAM, IPPROTO_IPV6);
+	//list = addPacket(NULL, "start", 6, 0);
+	resendSocket = socket(AF_INET6, SOCK_RAW, IPPROTO_IPV6);
+	printf("resend socket %d \n", resendSocket);
 	return;
 }
 
 void receivePacket(char* msg, int returned, int ctrSock) {
-
+	printf("call receivePacket \n");
 	short dataLength = 1207;
 	uint tid = nextTid;
 	char cid = 0x80;
@@ -50,11 +52,14 @@ void receivePacket(char* msg, int returned, int ctrSock) {
 	if(send(ctrSock, elevateMsg, dataLength, 0) == -1){
 		printf("Send error \n");
 	} else {
+		printf("ship it \n");
 		list = addPacket( list, msg, returned, tid);
 		printPackets(list);
 	}
 
 	nextTid++;
+	printf("elevated \n");
+	free(elevateMsg);
 	return;
 }
 
@@ -65,17 +70,17 @@ int resendElevatedPacket( int tid, char** args){
 		dest->sin6_family = AF_PACKET;
 		if( sendto(resendSocket, resendPacket->packet, resendPacket->length,
 			0, (struct sockaddr*) &dest, sizeof(struct sockaddr_in6)) == -1) {
-			
-			printf("resend error\n");
+			printf("resend error %s\n", strerror(errno));
 			return 1;
 		}
 		list = remPacket( list, tid);
+		free(dest);
 		return 0;
 	}
 	return 1;
 }
 
 int dropElevatedPacket( int tid){
-	remPacket( list, tid);
+	list = remPacket( list, tid);
 	return 0;
 }

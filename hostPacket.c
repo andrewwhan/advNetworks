@@ -20,7 +20,7 @@ int resendSocket;
 
 void createResendSocket() {
 	//list = addPacket(NULL, "start", 6, 0);
-	resendSocket = socket(AF_INET6, SOCK_RAW, IPPROTO_IPV6);
+	resendSocket = socket(AF_INET6, SOCK_RAW, IPPROTO_RAW);
 	printf("resend socket %d \n", resendSocket);
 	return;
 }
@@ -63,11 +63,21 @@ void receivePacket(char* msg, int returned, int ctrSock) {
 	return;
 }
 
-int resendElevatedPacket( int tid, char** args){
+int resendElevatedPacket( int tid, char* args){
 	packetEntry* resendPacket = getPacket(list, tid);
 	if( resendPacket != NULL) {
 		struct sockaddr_in6* dest = malloc(sizeof(struct sockaddr_in6));		// destination address
-		dest->sin6_family = AF_PACKET;
+		memset(dest, 0, sizeof(struct sockaddr_in6));
+		dest->sin6_family = AF_INET6;
+		struct in6_addr* dur = malloc(sizeof(struct in6_addr));
+		memcpy(&(dur->s6_addr), (args + 16), 16);
+		dest->sin6_addr = *dur;
+		//memcpy(&(dest->sin6_addr), (args + 16), 16);
+		char destAddr[INET6_ADDRSTRLEN];
+		inet_ntop(AF_INET6, dur->s6_addr, destAddr, INET6_ADDRSTRLEN);
+		printf("dur %s \n", destAddr);
+		inet_ntop(AF_INET6, dur->s6_addr, destAddr, INET6_ADDRSTRLEN);
+		printf("dest %s \n", destAddr);
 		if( sendto(resendSocket, resendPacket->packet, resendPacket->length,
 			0, (struct sockaddr*) &dest, sizeof(struct sockaddr_in6)) == -1) {
 			printf("resend error %s\n", strerror(errno));

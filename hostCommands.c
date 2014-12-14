@@ -521,7 +521,7 @@ int showRule(char cid, uint tid, short dataLength, char* dataStart) {
 
 int resendPacket(char cid, uint tid, short dataLength, char* dataStart){
 	char** args = { '\0' };
-	return !resendElevatedPacket( tid, args);
+	return !resendElevatedPacket( tid, dataStart);
 }
 
 int dropPacket(char cid, uint tid, short dataLength, char* dataStart) {

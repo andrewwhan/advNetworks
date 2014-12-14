@@ -61,11 +61,11 @@ void receivePacket(char* msg, int returned, int ctrSock) {
 int resendElevatedPacket( int tid, char** args){
 	packetEntry* resendPacket = getPacket(list, tid);
 	if( resendPacket != NULL) {
-		struct sockaddr_ll* dest = malloc(sizeof(struct sockaddr_ll));		// destination address
-		dest->sll_family = AF_PACKET;
-		dest->sll_protocol = htons(ETH_P_ALL);
-		dest->sll_ifindex = if_nametoindex("eth0");
-		if( sendto(resendSocket, resendPacket->packet, resendPacket->length, 0, (struct sockaddr*) &dest, sizeof(dest)) == -1) {
+		struct sockaddr_in6* dest = malloc(sizeof(struct sockaddr_in6));		// destination address
+		dest->sin6_family = AF_PACKET;
+		if( sendto(resendSocket, resendPacket->packet, resendPacket->length,
+			0, (struct sockaddr*) &dest, sizeof(struct sockaddr_in6)) == -1) {
+			
 			printf("resend error\n");
 			return 1;
 		}

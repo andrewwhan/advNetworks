@@ -69,7 +69,7 @@ int resendElevatedPacket( int tid, char** args){
 			printf("resend error\n");
 			return 1;
 		}
-		list = removePacket( list, tid);
+		list = remPacket( list, tid);
 		return 0;
 	}
 	return 1;

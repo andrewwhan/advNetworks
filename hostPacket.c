@@ -10,6 +10,7 @@
 #include "hostPacket.h"
 #include "sendAndExecute.h"
 #include "list.h"
+#include <errno.h>
 
 #define HEADER 7
 
@@ -19,7 +20,8 @@ int resendSocket;
 
 void createResendSocket() {
 	//list = addPacket(NULL, "start", 6, 0);
-	resendSocket = socket(AF_INET6, SOCK_DGRAM, IPPROTO_IPV6);
+	resendSocket = socket(AF_INET6, SOCK_RAW, IPPROTO_IPV6);
+	printf("resend socket %d \n", resendSocket);
 	return;
 }
 
@@ -57,6 +59,7 @@ void receivePacket(char* msg, int returned, int ctrSock) {
 
 	nextTid++;
 	printf("elevated \n");
+	free(elevateMsg);
 	return;
 }
 
@@ -68,10 +71,11 @@ int resendElevatedPacket( int tid, char** args){
 		dest->sll_protocol = htons(ETH_P_ALL);
 		dest->sll_ifindex = if_nametoindex("eth0");
 		if( sendto(resendSocket, resendPacket->packet, resendPacket->length, 0, (struct sockaddr*) &dest, sizeof(dest)) == -1) {
-			printf("resend error\n");
+			printf("resend error %s\n", strerror(errno));
 			return 1;
 		}
 		list = remPacket( list, tid);
+		free(dest);
 		return 0;
 	}
 	return 1;

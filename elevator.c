@@ -53,6 +53,7 @@ void elevate(int sockinfo){
 
 void resend(int sockinfo, char* msg){
 	uint tid = *(uint*)(msg + 1);
+	short dataLength = 32;
 	char* dataStart = msg + 7;
 
 	char* reply = malloc(40*sizeof(char));
@@ -61,18 +62,19 @@ void resend(int sockinfo, char* msg){
 
 	*(reply + msgLoc) = 0x81;
 	msgLoc++;
-	*(reply + msgLoc) = tid;
+	memcpy(reply + msgLoc, &tid, sizeof(uint));
 	msgLoc += 4;
-	*(reply + msgLoc) = 32;
+	memcpy(reply + msgLoc, &dataLength, sizeof(short));
 	msgLoc += 2;
 	memcpy(reply + msgLoc, dataStart+8, 32);
 	if(send(sockinfo, reply, 39, 0) == -1){
 		printf("Send error \n");
 		close(sockinfo);
 	} else {
-		printf("Successfully sent\n");
+		printf("Successfully sent reply: \n %u, %hi \n", *(uint*)(reply + 1), *(short*)(reply + 5));
 		awaitResponse(sockinfo);
 	}
+	free(reply);
 }
 
 void drop(int sockinfo, char* msg){
@@ -98,4 +100,5 @@ void drop(int sockinfo, char* msg){
 		printf("Successfully sent drop\n");
 		awaitResponse(sockinfo);
 	}
+	free(reply);
 }

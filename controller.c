@@ -210,9 +210,9 @@ void listenForHosts(){
 		currentHost = firstHost;
 		while(currentHost != NULL){
 			if(currentHost->socket != 0){
-				printf("checking %s \n", currentHost->hostName);
+				//printf("checking %s \n", currentHost->hostName);
 				if(FD_ISSET(currentHost->socket, &inputs)){
-					printf("dat elevation request tho \n");
+					//printf("dat elevation request tho \n");
 					elevate(currentHost->socket);
 				}
 			}

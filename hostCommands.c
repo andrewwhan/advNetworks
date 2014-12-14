@@ -206,6 +206,7 @@ int addNeighbor(char cid, uint tid, short dataLength, char* dataStart) {
 
 	int success = executeArgs(args);
 
+	free(cmdtok);
 	return success;
 }
 
@@ -221,6 +222,7 @@ int removeNeighbor(char cid, uint tid, short dataLength, char* dataStart) {
 		success = 0;
 	}
 
+	free(cmdtok);
 	return success;
 }
 
@@ -321,6 +323,7 @@ int showRoute(char cid, uint tid, short dataLength, char* dataStart) {
 
 	int success = executeShow(args);
 
+	free(cmdtok);
 	return success;
 }
 
@@ -440,7 +443,7 @@ int addTable(char cid, uint tid, short dataLength, char* dataStart) {
 	}
 	
 	fclose(newTableFile);
-	
+	free(cmdtok);
 	return 1;
 }
 
@@ -452,6 +455,7 @@ int removeTable(char cid, uint tid, short dataLength, char* dataStart) {
 	
 	int success = executeShow(args);
 
+	free(cmdtok);
 	return success;
 }
 
@@ -511,6 +515,7 @@ int showRule(char cid, uint tid, short dataLength, char* dataStart) {
 
 	int success = executeShow(args);
 
+	free(cmdtok);
 	return success;
 }
 

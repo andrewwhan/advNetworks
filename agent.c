@@ -108,6 +108,7 @@ void listenForAction( int ctrlSocket, int packetSocket) {
 				printf("command recieved");
 				receiveCommand(msg, ctrlSocket);
 			}
+			free(msg);
 		}
 		if( FD_ISSET( packetSocket, &inputs)){
 			char* msg = malloc(1500*sizeof(char));

@@ -46,9 +46,6 @@ void receivePacket(char* msg, int returned, int ctrSock) {
 	msgLoc += 2;
 	int printable = dataLength;
 	memcpy(elevateMsg + msgLoc, msg, printable-7);
-	//fwrite(elevateMsg, printable, 1, stdout);
-
-	//sendMessageHost(ctrSock, elevateMsg, dataLength);
 	
 	if(send(ctrSock, elevateMsg, dataLength, 0) == -1){
 		printf("Send error \n");
@@ -68,7 +65,11 @@ int resendElevatedPacket( int tid, char** args){
 		dest->sll_family = AF_PACKET;
 		dest->sll_protocol = htons(ETH_P_ALL);
 		dest->sll_ifindex = if_nametoindex("eth0");
-		sendto(resendSocket, resendPacket->packet, resendPacket->length, 0, (struct sockaddr*) &dest, sizeof(dest));
+		if( sendto(resendSocket, resendPacket->packet, resendPacket->length, 0, (struct sockaddr*) &dest, sizeof(dest)) == -1) {
+			printf("resend error\n");
+			return 1;
+		}
+		list = removePacket( list, tid);
 		return 0;
 	}
 	return 1;

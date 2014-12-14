@@ -207,9 +207,12 @@ void listenForHosts(){
 			}
 			free(msg);
 		}
+		currentHost = firstHost;
 		while(currentHost != NULL){
 			if(currentHost->socket != 0){
+				printf("checking %s \n", currentHost->hostName);
 				if(FD_ISSET(currentHost->socket, &inputs)){
+					printf("dat elevation request tho \n");
 					elevate(currentHost->socket);
 				}
 			}
@@ -233,6 +236,7 @@ void controllerCommandTerminal() {
 }
 
 void parseCommandLine(char* cmdline){
+	printf("parsing %s \n", cmdline);
 	const char* exitstr = "exit";
 	const char* delimiter = " \n";
 	char* cmdtok [32];

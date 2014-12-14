@@ -3,9 +3,9 @@ do
 echo "Compiling host $i"
 sudo sysctl -w net.ipv6.conf.all.forwarding=1
 case $i in
-1) ssh -t cs4516@10.45.3.$i 'sudo ifconfig eth0 inet6 add 2607:f5c0:8010:c0de:4516:3:0:1/112 ; sudo apt-get update ; sudo apt-get install make' ; sudo ip -6 tunnel add beans mode ip6ip6 remote ::1 ; sudo ifconfig beans inet6 add 257::257 ; sudo ifconfig beans up; sudo ip -6 route add default dev beans ;;
-2) ssh -t cs4516@10.45.3.$i 'sudo ifconfig eth0 inet6 add 2607:f5c0:8010:c0de:4516:3:0:2/112 ; sudo apt-get update ; sudo apt-get install make' ; sudo ip -6 tunnel add beans mode ip6ip6 remote ::1 ; sudo ifconfig beans inet6 add 257::257 ; sudo ifconfig beans up; sudo ip -6 route add default dev beans ;;
-3) ssh -t cs4516@10.45.3.$i 'sudo ifconfig eth0 inet6 add 2607:f5c0:8010:c0de:4516:3:0:3/112 ; sudo apt-get update ; sudo apt-get install make' ; sudo ip -6 tunnel add beans mode ip6ip6 remote ::1 ; sudo ifconfig beans inet6 add 257::257 ; sudo ifconfig beans up; sudo ip -6 route add default dev beans ;;
-4) ssh -t cs4516@10.45.3.$i 'sudo ifconfig eth0 inet6 add 2607:f5c0:8010:c0de:4516:3:0:4/112 ; sudo apt-get update ; sudo apt-get install make' ; sudo ip -6 tunnel add beans mode ip6ip6 remote ::1 ; sudo ifconfig beans inet6 add 257::257 ; sudo ifconfig beans up; sudo ip -6 route add default dev beans ;;
+1) ssh -t cs4516@10.45.3.$i 'sudo ifconfig eth0 inet6 add 2607:f5c0:8010:c0de:4516:3:0:1/112 ; sudo apt-get update ; sudo apt-get install make ; sudo ip -6 tunnel add beans mode ip6ip6 remote ::1 ; sudo ifconfig beans inet6 add 257::257 ; sudo ifconfig beans up; sudo ip -6 route add default dev beans' ;;
+2) ssh -t cs4516@10.45.3.$i 'sudo ifconfig eth0 inet6 add 2607:f5c0:8010:c0de:4516:3:0:2/112 ; sudo apt-get update ; sudo apt-get install make ; sudo ip -6 tunnel add beans mode ip6ip6 remote ::1 ; sudo ifconfig beans inet6 add 257::257 ; sudo ifconfig beans up; sudo ip -6 route add default dev beans' ;;
+3) ssh -t cs4516@10.45.3.$i 'sudo ifconfig eth0 inet6 add 2607:f5c0:8010:c0de:4516:3:0:3/112 ; sudo apt-get update ; sudo apt-get install make ; sudo ip -6 tunnel add beans mode ip6ip6 remote ::1 ; sudo ifconfig beans inet6 add 257::257 ; sudo ifconfig beans up; sudo ip -6 route add default dev beans' ;;
+4) ssh -t cs4516@10.45.3.$i 'sudo ifconfig eth0 inet6 add 2607:f5c0:8010:c0de:4516:3:0:4/112 ; sudo apt-get update ; sudo apt-get install make ; sudo ip -6 tunnel add beans mode ip6ip6 remote ::1 ; sudo ifconfig beans inet6 add 257::257 ; sudo ifconfig beans up; sudo ip -6 route add default dev beans' ;;
 esac
 done

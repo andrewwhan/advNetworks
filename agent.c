@@ -9,10 +9,10 @@
 int main(){
 	int ctrlSocket, packetSocket;
 	createResendSocket();
-	packetSocket = esablishPacketSocket();
+	packetSocket = establishPacketSocket();
 	ctrlSocket = controllerConnect();
 	if(ctrlSocket != -1 && packetSocket != -1){
-		listenForAciton( ctrlSocket, packetSocket);
+		listenForAction( ctrlSocket, packetSocket);
 	}
 	return;
 }
@@ -67,7 +67,7 @@ int controllerConnect(){
 	return sockinfo;
 }
 
-int esablishPacketSocket() {
+int establishPacketSocket() {
 	int sockinfo;
 	sockinfo = socket(AF_PACKET, SOCK_DGRAM, htons(ETH_P_ALL));								// establish socket
 	
@@ -88,17 +88,18 @@ int esablishPacketSocket() {
 	}
 }
 
-void listenForAciton( int ctrlSocket, int packetSocket) {
+void listenForAction( int ctrlSocket, int packetSocket) {
 	fd_set inputs;
 	int numfds;
-	FD_ZERO(&inputs);
-	FD_SET(ctrlSocket, &inputs); //stdin
-	FD_SET(packetSocket, &inputs); //listen socket
 	if( ctrlSocket > packetSocket) numfds = ctrlSocket;
 	else numfds = packetSocket;
 	int returned;
 	
 	while(1) {
+		printf("selecting \n");
+		FD_ZERO(&inputs);
+		FD_SET(ctrlSocket, &inputs); //stdin
+		FD_SET(packetSocket, &inputs); //listen socket
 		select(numfds+1, &inputs, NULL, NULL, NULL);
 		if( FD_ISSET( ctrlSocket, &inputs)){
 			char* msg = malloc(1500*sizeof(char));

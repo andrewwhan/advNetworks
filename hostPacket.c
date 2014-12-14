@@ -18,13 +18,13 @@ packetEntry* list = NULL;
 int resendSocket;
 
 void createResendSocket() {
-
+	//list = addPacket(NULL, "start", 6, 0);
 	resendSocket = socket(AF_INET6, SOCK_DGRAM, IPPROTO_IPV6);
 	return;
 }
 
 void receivePacket(char* msg, int returned, int ctrSock) {
-
+	printf("call receivePacket \n");
 	short dataLength = 1207;
 	uint tid = nextTid;
 	char cid = 0x80;
@@ -50,11 +50,13 @@ void receivePacket(char* msg, int returned, int ctrSock) {
 	if(send(ctrSock, elevateMsg, dataLength, 0) == -1){
 		printf("Send error \n");
 	} else {
+		printf("ship it \n");
 		list = addPacket( list, msg, returned, tid);
 		printPackets(list);
 	}
 
 	nextTid++;
+	printf("elevated \n");
 	return;
 }
 

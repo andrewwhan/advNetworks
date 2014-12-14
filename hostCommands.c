@@ -131,6 +131,7 @@ void receiveCommand(char* messagePtr, int socket) {
 			break;
 		case 0x82:
 			// Drop Packet
+			printf("Droppin this \n");
 			status = dropPacket(cid, tid, dataLength, dataStart);
 			break;
 		case 0x0A:

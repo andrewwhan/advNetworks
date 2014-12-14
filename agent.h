@@ -7,4 +7,5 @@
 #include <netdb.h>
 
 int controllerConnect();
-void listenForAciton( int socket, int packetSocket);
+void listenForAction( int socket, int packetSocket);
+int establishPacketSocket();

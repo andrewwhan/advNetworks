@@ -1,0 +1,14 @@
+We are going to test that our program automatically updates the network in accordance with its rules when a machine cannot route correctly.
+First we will remove the routes to other hosts from host1 using the route remove command.
+Then we will start a ping6 from host1 to host2. This ping will fail to complete.
+Then we will start our controller. After that, we will start the agent.
+Then we will check the ping, and if the ping is funcitonal, the controller has successfully corrected the network.
+We will also view the output logs to show the following:
+1) The agent recieves unroutable packets from its tunnel.
+2) The host properly wraps 1200 of the bytes in the packets being elevated, and then sends that message to the controller.
+3) The controller properly recieves and handles the elevated packet.
+4) The controller consults its rule book, and dispaches commands appropriately.
+5) The hosts recieve those commands and executes the commands.
+6) The controller sends the message to either resend or drop the packet.
+7) The host properly drops the packet. Resending is not functional.
+If all of these are true, we have, for the most part, completed phase 4.

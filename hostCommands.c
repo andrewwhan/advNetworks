@@ -14,7 +14,7 @@ void receiveCommand(char* messagePtr, int socket) {
 	short dataLength = *(short*)(messagePtr + 5);
 	char* dataStart = messagePtr + 7;
 
-	printf("cid:		%02X\n", cid);
+	printf("cid:		%02X\n", (unsigned char)cid);
 	printf("tid:		%u\n", tid);
 	printf("dataLength:	%hd\n", dataLength);
 	printf("dataStart:	%s\n", dataStart);

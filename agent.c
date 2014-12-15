@@ -105,7 +105,8 @@ void listenForAction( int ctrlSocket, int packetSocket) {
 			char* msg = malloc(1500*sizeof(char));
 			returned = recv(ctrlSocket, msg, 1500, 0);
 			if (returned > 0) {
-				printf("command recieved");
+				printf("ctrl received %d \n", returned);
+				//printf("command recieved \n");
 				receiveCommand(msg, ctrlSocket);
 			}
 			free(msg);
@@ -114,7 +115,8 @@ void listenForAction( int ctrlSocket, int packetSocket) {
 			char* msg = malloc(1500*sizeof(char));
 			returned = recv(packetSocket, msg, 1500, 0);
 			if (returned > 0) {
-				printf("\npacket recieved\n");
+				printf("packet received %d \n", returned);
+				//printf("\npacket recieved\n");
 				receivePacket( msg, returned, ctrlSocket);
 			}
 			free(msg);

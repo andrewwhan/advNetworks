@@ -4,13 +4,15 @@
 #include <sys/types.h>
 #include <string.h>
 #include <sys/socket.h>
-#include <netpacket/packet.h>
+//#include <netpacket/packet.h>
 #include <net/ethernet.h>
 #include <netinet/in.h>
+#include <net/if.h>
 #include "hostPacket.h"
 #include "sendAndExecute.h"
 #include "list.h"
 #include <errno.h>
+#include <linux/if_packet.h>
 
 #define HEADER 7
 
@@ -21,7 +23,6 @@ int resendSocket;
 void createResendSocket() {
 	//list = addPacket(NULL, "start", 6, 0);
 	resendSocket = socket(AF_INET6, SOCK_RAW, IPPROTO_RAW);
-	printf("resend socket %d \n", resendSocket);
 	return;
 }
 
@@ -55,6 +56,7 @@ void receivePacket(char* msg, int returned, int ctrSock) {
 		printf("ship it \n");
 		list = addPacket( list, msg, returned, tid);
 		printPackets(list);
+		printf("\n");
 	}
 
 	nextTid++;
@@ -66,20 +68,16 @@ void receivePacket(char* msg, int returned, int ctrSock) {
 int resendElevatedPacket( int tid, char* args){
 	packetEntry* resendPacket = getPacket(list, tid);
 	if( resendPacket != NULL) {
+		printf("resend socket %d \n", resendSocket);
 		struct sockaddr_in6* dest = malloc(sizeof(struct sockaddr_in6));		// destination address
 		memset(dest, 0, sizeof(struct sockaddr_in6));
 		dest->sin6_family = AF_INET6;
-		struct in6_addr* dur = malloc(sizeof(struct in6_addr));
+		struct in6_addr* dur = calloc(1, sizeof(struct in6_addr));
 		memcpy(&(dur->s6_addr), (args + 16), 16);
 		dest->sin6_addr = *dur;
 		//memcpy(&(dest->sin6_addr), (args + 16), 16);
-		char destAddr[INET6_ADDRSTRLEN];
-		inet_ntop(AF_INET6, dur->s6_addr, destAddr, INET6_ADDRSTRLEN);
-		printf("dur %s \n", destAddr);
-		inet_ntop(AF_INET6, dur->s6_addr, destAddr, INET6_ADDRSTRLEN);
-		printf("dest %s \n", destAddr);
-		if( sendto(resendSocket, resendPacket->packet, resendPacket->length,
-			0, (struct sockaddr*) &dest, sizeof(struct sockaddr_in6)) == -1) {
+		if(sendto(resendSocket, resendPacket->packet, resendPacket->length,
+			0, (struct sockaddr*) dest, sizeof(struct sockaddr_in6)) == -1) {
 			printf("resend error %s\n", strerror(errno));
 			return 1;
 		}

@@ -1,158 +1,69 @@
 root@andrew-VirtualBox:/media/sf_cs4516# ./controller
+host1.team3.4516.cs.wpi.edu 2607::23 35::12 one 
+host2.team3.4516.cs.wpi.edu 24::12 123::1 mean 
+host3.team3.4516.cs.wpi.edu * 123::14 hi 
+host1.team3.4516.cs.wpi.edu 257::257 2607:f5c0:8010:c0de:4516:3:0:2 route add host1.team3.4516.cs.wpi.edu 2607:f5c0:8010:c0de:4516:3:0:2 dev eth0 
 Socket set up 
 Host host1.team3.4516.cs.wpi.edu connected! 
->> Host host2.team3.4516.cs.wpi.edu connected! 
->> Host host3.team3.4516.cs.wpi.edu connected! 
->> Host host4.team3.4516.cs.wpi.edu connected! 
-All hosts connected! 
->> table add host2.team3.4516.cs.wpi.edu shmork
+>> Execute rule for host1.team3.4516.cs.wpi.edu 
 Successfully sent
-cid:		06
-tid:		1352
+Response cid:		01
+tid:		201
 dataLength:	40
 Success! specified command was executed 
->> route add host2.team3.4516.cs.wpi.edu 2607:f5c0:8010:c0de:4516:3:0:4 via 2607:f5c0:8010:c0de:4516:3:0:3 dev eth0 table shmork
-Successfully sent
+Resend this 
+Successfully sent resend command
+Response cid:		81
+tid:		1350
+dataLength:	40
+Success! specified command was executed 
+
+
+cs4516@host1:~/sf_cs4516$ sudo ./agent
+working
+selecting 
+packet received 104 
+call receivePacket 
+ship it 
+.
+elevated 
+selecting 
+ctrl received 85 
 cid:		01
-tid:		1353
-dataLength:	40
-Success! specified command was executed 
->> route show host2.team3.4516.cs.wpi.edu shmork
-Successfully sent
-cid:		21
-tid:		1357
-dataLength:	90
-2607:f5c0:8010:c0de:4516:3:0:4 via 2607:f5c0:8010:c0de:4516:3:0:3 dev eth0  metric 1024 
->> rule add host2.team3.4516.cs.wpi.edu to 2607:f5c0:8010:c0de:4516:3:0:4 table shmork
-Successfully sent
-cid:		07
-tid:		1359
-dataLength:	40
-Success! specified command was executed 
->> rule show host2.team3.4516.cs.wpi.edu
-Successfully sent
-cid:		27
-tid:		1360
-dataLength:	123
-0:	from all lookup local 
-16383:	from all to 2607:f5c0:8010:c0de:4516:3:0:4 lookup shmork 
-32766:	from all lookup main 
->> rule remove host2.team3.4516.cs.wpi.edu to 2607:f5c0:8010:c0de:4516:3:0:4 table shmork
-Successfully sent
-cid:		17
-tid:		1362
-dataLength:	40
-Success! specified command was executed 
->> rule show host2.team3.4516.cs.wpi.edu
-Successfully sent
-cid:		27
-tid:		1363
-dataLength:	57
-0:	from all lookup local 
-32766:	from all lookup main 
->> route remove host2.team3.4516.cs.wpi.edu 2607:f5c0:8010:c0de:4516:3:0:4 via 2607:f5c0:8010:c0de:4516:3:0:3 dev eth0 table shmork
-Successfully sent
-cid:		11
-tid:		1365
-dataLength:	40
-Success! specified command was executed 
->> route show host2.team3.4516.cs.wpi.edu shmork 
-Successfully sent
-cid:		21
-tid:		1366
-dataLength:	0
->> table remove host2.team3.4516.cs.wpi.edu shmork
-Successfully sent
-cid:		16
-tid:		1367
-dataLength:	40
-Success! specified command was executed 
->> neigh show host3.team3.4516.cs.wpi.edu
-Successfully sent
-cid:		28
-tid:		1368
-dataLength:	1160
-fe80::5054:ff:fe45:1639 dev eth0 lladdr 52:54:00:45:16:39 STALE
-fe80::5054:ff:fe45:163a dev eth0 lladdr 52:54:00:45:16:3a STALE
-`fe80::5054:ff:fe45:163b dev eth0 lladdr 52:54:00:45:16:3b STALE
-fe80::5054:ff:fe45:160c dev eth0 lladdr 52:54:00:45:16:0c STALE
-2607:f5c0:8010:c0de:4516:3:0:257 dev eth0 lladdr 52:54:00:45:16:09 STALE
-fe80::5054:ff:fe45:163c dev eth0 lladdr 52:54:00:45:16:3c STALE
-fe80::a56e:459e:22c7:8427 dev eth0 lladdr 00:90:f5:d3:de:2c STALE
-fe80::9929:d9f5:4314:6c27 dev eth0 lladdr f0:de:f1:ed:00:5d STALE
-2607:f5c0:8010:c0de:4516:3:0:1 dev eth0 lladdr 52:54:00:45:16:09 STALE
-2607:f5c0:8010:c0de:4516:3:0:2 dev eth0 lladdr 52:54:00:45:16:0a STALE
-2607:f5c0:8010:c0de:4516:3:0:4 dev eth0 lladdr 52:54:00:45:16:0c STALE
-fe80::a00:27ff:fed9:f401 dev eth0 lladdr 08:00:27:d9:f4:01 router STALE
-fe80::5054:ff:fe45:1609 dev eth0 lladdr 52:54:00:45:16:09 STALE
-fe80::5054:ff:fe45:160a dev eth0 lladdr 52:54:00:45:16:0a STALE
-10.45.3.2 dev eth0 lladdr 52:54:00:45:16:0a STALE
-10.45.3.4 dev eth0 lladdr 52:54:00:45:16:0c STALE
-10.10.0.2 dev eth0 lladdr 52:54:00:b1:a3:f0 REACHABLE
-10.45.3.1 dev eth0 lladdr 52:54:00:45:16:09 STALE
+tid:		201
+dataLength:	78
+dataStart:	route add host1.team3.4516.cs.wpi.edu 2607:f5c0:8010:c0de:4516:3:0:2 dev eth0
+success
+cid: 
+selecting 
+ctrl received 39 
+cid:		81
+tid:		1350
+dataLength:	32
+dataStart:	W
+resend socket 3 
+removed something 
+success
+cid: ?
+selecting 
 
->> neigh add host3.team3.4516.cs.wpi.edu 56::14 a3:23:45:f1:12:01 
-Successfully sent
-cid:		08
-tid:		1369
-dataLength:	40
-Success! specified command was executed 
->> neigh show host3.team3.4516.cs.wpi.edu
-Successfully sent
-cid:		28
-tid:		1370
-dataLength:	1354
-56::14 dev eth0 lladdr a3:23:45:f1:12:01 PERMANENT
-fe80::5054:ff:fe45:1639 dev eth0 lladdr 52:54:00:45:16:39 STALE
-fe80::5054:ff:fe45:163a dev eth0 lladdr 52:54:00:45:16:3a STALE
-fe80::5054:ff:fe45:163b dev eth0 lladdr 52:54:00:45:16:3b STALE
-fe80::5054:ff:fe45:160c dev eth0 lladdr 52:54:00:45:16:0c STALE
-2607:f5c0:8010:c0de:4516:3:0:257 dev eth0 lladdr 52:54:00:45:16:09 STALE
-fe80::5054:ff:fe45:163c dev eth0 lladdr 52:54:00:45:16:3c STALE
-fe80::a56e:459e:22c7:8427 dev eth0 lladdr 00:90:f5:d3:de:2c STALE
-fe80::9929:d9f5:4314:6c27 dev eth0 lladdr f0:de:f1:ed:00:5d STALE
-2607:f5c0:8010:c0de:4516:3:0:1 dev eth0 lladdr 52:54:00:45:16:09 STALE
-2607:f5c0:8010:c0de:4516:3:0:2 dev eth0 lladdr 52:54:00:45:16:0a STALE
-2607:f5c0:8010:c0de:4516:3:0:4 dev eth0 lladdr 52:54:00:45:16:0c STALE
-2607:f5c0:8010:c0de:4516:3:0:5 dev eth0 lladdr 08:00:27:d9:f4:01 router REACHABLE
-fe80::a00:27ff:fed9:f401 dev eth0 lladdr 08:00:27:d9:f4:01 router REACHABLE
-fe80::5054:ff:fe45:1609 dev eth0 lladdr 52:54:00:45:16:09 STALE
-fe80::5054:ff:fe45:160a dev eth0 lladdr 52:54:00:45:16:0a STALE
-10.45.3.2 dev eth0 lladdr 52:54:00:45:16:0a STALE
-10.45.3.4 dev eth0 lladdr 52:54:00:45:16:0c STALE
-10.45.3.5 dev eth0 lladdr 08:00:27:d9:f4:01 REACHABLE
-10.10.0.2 dev eth0 lladdr 52:54:00:b1:a3:f0 REACHABLE
-10.45.3.1 dev eth0 lladdr 52:54:00:45:16:09 STALE
 
->> neigh remove host3.team3.4516.cs.wpi.edu 56::14 a3:23:45:f1:12:01
-Successfully sent
-cid:		18
-tid:		1371
-dataLength:	40
-Success! specified command was executed 
->> neigh show host3.team3.4516.cs.wpi.edu
-Successfully sent
-cid:		28
-tid:		1372
-dataLength:	1298
-fe80::5054:ff:fe45:1639 dev eth0 lladdr 52:54:00:45:16:39 STALE
-fe80::5054:ff:fe45:163a dev eth0 lladdr 52:54:00:45:16:3a STALE
- fe80::5054:ff:fe45:163b dev eth0 lladdr 52:54:00:45:16:3b STALE
-fe80::5054:ff:fe45:160c dev eth0 lladdr 52:54:00:45:16:0c STALE
-2607:f5c0:8010:c0de:4516:3:0:257 dev eth0 lladdr 52:54:00:45:16:09 STALE
-fe80::5054:ff:fe45:163c dev eth0 lladdr 52:54:00:45:16:3c STALE
-fe80::a56e:459e:22c7:8427 dev eth0 lladdr 00:90:f5:d3:de:2c STALE
-fe80::9929:d9f5:4314:6c27 dev eth0 lladdr f0:de:f1:ed:00:5d STALE
-2607:f5c0:8010:c0de:4516:3:0:1 dev eth0 lladdr 52:54:00:45:16:09 STALE
-2607:f5c0:8010:c0de:4516:3:0:2 dev eth0 lladdr 52:54:00:45:16:0a STALE
-2607:f5c0:8010:c0de:4516:3:0:4 dev eth0 lladdr 52:54:00:45:16:0c STALE
-2607:f5c0:8010:c0de:4516:3:0:5 dev eth0 lladdr 08:00:27:d9:f4:01 router REACHABLE
-fe80::a00:27ff:fed9:f401 dev eth0 lladdr 08:00:27:d9:f4:01 router STALE
-fe80::5054:ff:fe45:1609 dev eth0 lladdr 52:54:00:45:16:09 STALE
-fe80::5054:ff:fe45:160a dev eth0 lladdr 52:54:00:45:16:0a STALE
-10.45.3.2 dev eth0 lladdr 52:54:00:45:16:0a STALE
-10.45.3.4 dev eth0 lladdr 52:54:00:45:16:0c STALE
-10.45.3.5 dev eth0 lladdr 08:00:27:d9:f4:01 REACHABLE
-10.10.0.2 dev eth0 lladdr 52:54:00:b1:a3:f0 REACHABLE
-10.45.3.1 dev eth0 lladdr 52:54:00:45:16:09 STALE
+cs4516@host1:~$ sudo ip -6 route del 2607:f5c0:8010:c0de:4516:3:0:2 dev eth0
+cs4516@host1:~$ sudo ip -6 route show
+257::257 dev beans  proto kernel  metric 256 
+2607:f5c0:8010:c0de:4516:3:0:5 dev eth0  metric 1024 
+fe80::/64 dev eth0  proto kernel  metric 256 
+fe80::/64 dev beans  proto kernel  metric 256 
+default dev beans  metric 1024 
+cs4516@host1:~$ ping6 -c 4 2607:f5c0:8010:c0de:4516:3:0:2
+PING 2607:f5c0:8010:c0de:4516:3:0:2(2607:f5c0:8010:c0de:4516:3:0:2) 56 data bytes
+64 bytes from 2607:f5c0:8010:c0de:4516:3:0:2: icmp_seq=2 ttl=64 time=1.32 ms
+64 bytes from 2607:f5c0:8010:c0de:4516:3:0:2: icmp_seq=3 ttl=64 time=0.396 ms
+64 bytes from 2607:f5c0:8010:c0de:4516:3:0:2: icmp_seq=4 ttl=64 time=0.455 ms
+
+--- 2607:f5c0:8010:c0de:4516:3:0:2 ping statistics ---
+4 packets transmitted, 3 received, 25% packet loss, time 3003ms
+rtt min/avg/max/mdev = 0.396/0.726/1.327/0.425 ms
+cs4516@host1:~$ 
+
 

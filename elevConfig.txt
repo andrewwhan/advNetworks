@@ -1,4 +1,4 @@
-host1.team3.4516.cs.wpi.edu source=2607::23, dest=35::12, action=(butts; ass)
+host1.team3.4516.cs.wpi.edu source=2607::23, dest=35::12, action=(one; two)
 host2.team3.4516.cs.wpi.edu source=24::12, dest=123::1, action=(mean; bean)
 host3.team3.4516.cs.wpi.edu dest=123::14, action=(hi;)
 host1.team3.4516.cs.wpi.edu source=257::257, dest=2607:f5c0:8010:c0de:4516:3:0:2, action=(route add host1.team3.4516.cs.wpi.edu 2607:f5c0:8010:c0de:4516:3:0:2 dev eth0)

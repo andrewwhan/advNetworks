@@ -55,21 +55,40 @@ void sendMessage(char cid, char** cmdArgs){
 
 void awaitResponse( int sockinfo) {
 	char* msg = malloc(1500*sizeof(char));
-	int returned = recv(sockinfo, msg, 1500, 0);
-	if(returned > 0){
-		char cid = *msg;
-		uint tid = *(uint*)(msg + 1);
-		short dataLength = *(short*)(msg + 5);
-		char* dataStart = msg + 7;
+	while(1){
+		int returned = recv(sockinfo, msg, 7, 0);
+		if(returned > 0 && (unsigned char)*msg != 0x80){
+			char cid = *msg;
+			uint tid = *(uint*)(msg + 1);
+			short dataLength = *(short*)(msg + 5);
+			char* dataStart = msg + 7;
+			if(dataLength > 0){
+				returned = recv(sockinfo, msg+7, dataLength, 0);
+			}
+			printf("Response cid:		%02X\n", (unsigned char)cid);
+			printf("tid:		%u\n", tid);
+			printf("dataLength:	%hd\n", dataLength);
+			if(dataLength > 0){
+				fwrite(dataStart, dataLength, 1, stdout);
+				printf("\n");
+			}
+			free(msg);
+			return;
+		}
+		else if(returned > 0 && (unsigned char)(*msg) == 0x80){
 
-		printf("cid:		%02X\n", cid);
-		printf("tid:		%u\n", tid);
-		printf("dataLength:	%hd\n", dataLength);
-		fwrite(dataStart, dataLength, 1, stdout);
-		printf("\n");
+			char cid = *msg;
+			uint tid = *(uint*)(msg + 1);
+			short dataLength = *(short*)(msg + 5);
+			char* dataStart = msg + 7;
+			returned = recv(sockinfo, msg+7, dataLength, 0);
+			printf("ignored elevation request \n");
+		}
+		else{
+			free(msg);
+			return;
+		}
 	}
-	free(msg);
-	return;
 }
 
 void aliasCommand( char** cmdArgs) {

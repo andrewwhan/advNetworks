@@ -3,7 +3,7 @@
 #include "elevator.h"
 #include <errno.h>
 
-uint nextTid = 1351;
+uint nextTid = 200;
 struct hostInfo* firstHost;
 struct elevConfig* elevData;
 
@@ -158,11 +158,12 @@ void listenForHosts(){
 			addrSize = sizeof(hostAddr);
 			commSocket = accept(listenSocket, (struct sockaddr *)&hostAddr, &addrSize);
 			char* msg = malloc(1500*sizeof(char));
-			int returned = recv(commSocket, msg, 1500, 0);
+			int returned = recv(commSocket, msg, 7, 0);
 			if(returned > 0){
 				char cid = *msg;
 				uint tid = *(msg+1);
 				short dataLength = *(msg+5);
+				returned = recv(commSocket, msg+7, dataLength, 0);
 				if(cid == 0x04){
 					char hostName[32];
 					char secret[16];
@@ -236,7 +237,6 @@ void controllerCommandTerminal() {
 }
 
 void parseCommandLine(char* cmdline){
-	printf("parsing %s \n", cmdline);
 	const char* exitstr = "exit";
 	const char* delimiter = " \n";
 	char* cmdtok [32];

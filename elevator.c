@@ -5,30 +5,30 @@ void elevate(int sockinfo){
 	extern struct elevConfig* elevData;
 	char* hostName = getNameBySocket(sockinfo);
 	char* msg = malloc(1500*sizeof(char));
-	int returned = recv(sockinfo, msg, 1500, 0);
+	int returned = recv(sockinfo, msg, 7, 0);
 	if(returned > 0){
 		char cid = *msg;
 		uint tid = *(uint*)(msg + 1);
 		short dataLength = *(short*)(msg + 5);
 		char* dataStart = msg + 7;
-
-		printf("elevate:		%02X\n", cid);
-		printf("tid:		%u\n", tid);
-		printf("dataLength:	%hd\n", dataLength);
-		fwrite(dataStart, dataLength, 1, stdout);
-		printf("\n");
+		returned = recv(sockinfo, msg+7, dataLength, 0);
+		
+		// printf("elevate:		%02X\n", cid);
+		// printf("tid:		%u\n", tid);
+		// printf("dataLength:	%hd\n", dataLength);
+		// fwrite(dataStart, dataLength, 1, stdout);
+		// printf("\n");
 		char sourceAddr[INET6_ADDRSTRLEN];
 		char destAddr[INET6_ADDRSTRLEN];
 		inet_ntop(AF_INET6, (dataStart+8), sourceAddr, INET6_ADDRSTRLEN);
 		inet_ntop(AF_INET6, (dataStart+24), destAddr, INET6_ADDRSTRLEN);
 
 		struct elevConfig* currentRule = elevData;
-		printf("%s \n", currentRule->hostName);
 		while(currentRule != NULL){
 			if(!fnmatch(hostName, currentRule->hostName) &&
 				!fnmatch(sourceAddr, currentRule->sourceAddr) &&
 				!fnmatch(destAddr, currentRule->destAddr)){
-				printf("EXECUTE \n");
+				printf("Execute rule for %s \n", currentRule->hostName);
 				int i = 0;
 				while(currentRule->action[i] != NULL){
 					char* runAction = malloc(512 * sizeof(char));
@@ -71,7 +71,7 @@ void resend(int sockinfo, char* msg){
 		printf("Send error \n");
 		close(sockinfo);
 	} else {
-		printf("Successfully sent reply: \n %u, %hi \n", *(uint*)(reply + 1), *(short*)(reply + 5));
+		printf("Successfully sent resend command\n");
 		awaitResponse(sockinfo);
 	}
 	free(reply);
